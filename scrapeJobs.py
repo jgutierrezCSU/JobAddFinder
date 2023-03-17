@@ -2,35 +2,33 @@ import requests
 from bs4 import BeautifulSoup
 
 job_title = input("Enter job title: ")
-job_location = input("Enter job location: ")
-url = f"https://en.it-jobs.de/jobs?q={job_title.replace(' ', '+')}&l={job_location.replace(' ', '+')}"
+job_city= input("Enter city: ")
+job_country = "Germany" #input("Enter job location: ")
 
-'''
-added several headers to the requests, including an Accept-Language header, an Accept-Encoding header,
-a Referer header, a DNT header, a Connection header, and an Upgrade-Insecure-Requests header.
-These headers are commonly used by web browsers, so including them in your requests can help to 
-mimic a real user and avoid detection.
-'''
+# Construct the URL based on user inputs
+url = f"https://www.linkedin.com/jobs/search/?currentJobId=3456221826&geoId=103035651&keywords={job_title}&location={job_city}%2C%20{job_country}&refresh=true"
+
+# Send a GET request with headers to mimic a web browser
 headers = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
-    "Accept-Language": "en-US,en;q=0.5",
-    "Accept-Encoding": "gzip, deflate, br",
-    "Referer": "https://en.it-jobs.de/",
-    "DNT": "1",
-    "Connection": "keep-alive",
-    "Upgrade-Insecure-Requests": "1",
-}
-
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"}
 response = requests.get(url, headers=headers)
+print(response)
 
-if response.status_code == 200:
-    soup = BeautifulSoup(response.content, "html.parser")
-    job_listings = soup.find_all("div", class_="job_listing")
-    for job in job_listings:
-        title = job.find("h2", class_="job_title").text.strip()
-        company = job.find("div", class_="job_company").text.strip()
-        location = job.find("span", class_="job_location").text.strip()
-        summary = job.find("div", class_="job_description").text.strip()
-        print(f"Title: {title}\nCompany: {company}\nLocation: {location}\nSummary: {summary}\n")
-else:
-    print("Error: Request returned status code", response.status_code)
+# Parse the HTML response using BeautifulSoup
+soup = BeautifulSoup(response.content, "html.parser")
+
+# Extract job listings from the parsed HTML
+job_listings = soup.find_all("li", class_="result-card job-result-card result-card--with-hover-state")
+
+# Print the job listings
+for job in job_listings:
+    title = job.find("h3", class_="result-card__title job-result-card__title").text.strip()
+    company = job.find("a", class_="result-card__subtitle job-result-card__subtitle").text.strip()
+    location = job.find("span", class_="job-result-card__location").text.strip()
+    date_posted = job.find("time", class_="job-result-card__listdate--new").text.strip()
+
+    print(f"Job Title: {title}")
+    print(f"Company: {company}")
+    print(f"Location: {location}")
+    print(f"Date Posted: {date_posted}")
+    print()
