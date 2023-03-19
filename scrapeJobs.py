@@ -17,7 +17,6 @@ job_country = input("Enter job location: ")
 # job_city = "Berlin"
 # job_country = "Germany"
 
-
 browser = webdriver.Chrome()  # start a web browser
 
 """ Opening linkedIn's login page & Log in """
