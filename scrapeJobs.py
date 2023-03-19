@@ -1,11 +1,38 @@
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support.expected_conditions import visibility_of_element_located
+from selenium.webdriver.support import expected_conditions as EC
+
 import requests
 from bs4 import BeautifulSoup
 import time
+import localcred
 
+job_title = input("Enter job title: ")
+job_city = input("Enter city: ")
+job_country = input("Enter job location: ")
 
-job_title = "Software developer"  # input("Enter job title: ")
-job_city = "Berin"  # input("Enter city: ")
-job_country = "Germany"  # input("Enter job location: ")
+# job_title = "Software developer"
+# job_city = "Berlin"
+# job_country = "Germany"
+
+browser = webdriver.Chrome()  # start a web browser
+
+""" Opening linkedIn's login page & Log in """
+browser.get("https://linkedin.com/uas/login")
+# waiting for the page to load
+wait = WebDriverWait(browser, 10)
+username = wait.until(EC.visibility_of_element_located((By.NAME, "session_key")))
+# print(browser.page_source)
+username = browser.find_element(By.ID, "username")
+username.send_keys(localcred.u_cred)
+# submit entries
+pword = browser.find_element(By.ID, "password")
+pword.send_keys(localcred.p_cred)
+# click the button
+button = browser.find_element(By.XPATH, "//button[text()='Sign in']").click()
+""" Logged in Now """
 
 # Construct the URL based on user inputs
 url = f"https://www.linkedin.com/jobs/search/?currentJobId=3456221826&geoId=103035651&keywords={job_title}&location={job_city}%2C%20{job_country}&refresh=true"
@@ -37,53 +64,74 @@ for a in job_links:
 tmp = 0
 for job in job_links:
     # get URL
-    url = job["href"]
-    # print(url)
-    # get a general main page response
-    job_posts_response = requests.get(url, headers=headers)
-    # print(job_posts_response.content)
-    # parse that response for searching
-    soup = BeautifulSoup(job_posts_response.content, "html.parser")
+    indv_url = job["href"]
+    print(indv_url)
 
-    # this variable hasall info from main top card ( title , comp name, loc , date posted)
+    """ Navigate to each website and extract data"""
+    # retrieve fully rendered HTML content
+    time.sleep(5)
+    browser.get(indv_url)  # navigate to URL
+    # print(indv_url)
+    time.sleep(2)
 
-    print(soup)
-    # Now that we have all info , need to parse for specific details
+    # To get skills we must click on more button
+    button = browser.find_element(
+        By.XPATH, "//button[@class='jobs-unified-top-card__job-insight-text-button']"
+    ).click()
+    time.sleep(1)
+    content = browser.page_source
+    # print(content)
+
+    soup = BeautifulSoup(content, "html.parser")
+    # print(soup)
+    # Now that we general content , need to parse for specific details
     title = soup.find(
         "h1",
-        class_="top-card-layout__title font-sans text-lg papabear:text-xl font-bold leading-open text-color-text mb-0 topcard__title",
+        class_="t-24 t-bold jobs-unified-top-card__job-title",
     ).text.strip()
     print(title)
     company = soup.find(
         "span",
         class_="jobs-unified-top-card__company-name",
-    )
+    ).text.strip()
     print(company)
-    # location =
-    # date_posted =
+    location = soup.find(
+        "span",
+        class_="jobs-unified-top-card__bullet",
+    ).text.strip()
+    print(location)
 
-    time.sleep(2)
+    workplace_type = soup.find(
+        "span",
+        class_="jobs-unified-top-card__workplace-type",
+    )
+    if workplace_type is not None:
+        workplace_type = workplace_type.text.strip()
+        print(workplace_type)
+    date_posted = soup.find(
+        "span",
+        class_="jobs-unified-top-card__posted-date",
+    ).text.strip()
+    print(date_posted)
+
+    # SKILLS: get <ul> that has <li> containing all skills
+    ul = soup.find("ul", {"class": "job-details-skill-match-status-list"})
+    # now that I have <li> with skills,strip unnecessary chars
+    # remove "add" from results
+    skills_list = [li.text.strip().replace("Add", "") for li in ul.find_all("li")]
+    # remove /n and spaces from results
+    cleaned_list = [item.strip() for item in skills_list]
+    # create a readable string
+    result = ", ".join([item.strip() for item in cleaned_list])
+    print(result)
+
+    main_details = soup.find(
+        "div",
+        class_="jobs-box__html-content jobs-description-content__text t-14 t-normal jobs-description-content__text--stretch",
+    ).text.strip()
+    print(main_details, "\n")
+
+    time.sleep(1)
     tmp += 1  # testing
-    if tmp == 1:  # testing
+    if tmp == 2:  # testing
         break
-# job_posts_response = requests.get(ur, headers=headers)
-# print(job_posts_response)
-
-
-# # Print the job listings
-# for job in job_listings:
-#     title = job.find("h3", class_="result-card__title job-result-card__title").text.strip()
-#     company = job.find("a", class_="result-card__subtitle job-result-card__subtitle").text.strip()
-#     location = job.find("span", class_="job-result-card__location").text.strip()
-#     date_posted = job.find("time", class_="job-result-card__listdate--new").text.strip()
-
-#     print(f"Job Title: {title}")
-#     print(f"Company: {company}")
-#     print(f"Location: {location}")
-#     print(f"Date Posted: {date_posted}")
-#     print()
-# <span class="jobs-unified-top-card__company-name">
-#                   <a href="/company/medwing/life/" id="ember26" class="ember-view t-black t-normal">
-#                     MEDWING
-#                   </a>
-#             </span>
