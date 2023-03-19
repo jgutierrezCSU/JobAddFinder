@@ -1,0 +1,68 @@
+Enter job title: Enter city: Enter job location: https://de.linkedin.com/jobs/view/it-administrator-all-genders-at-next-big-thing-ag-3530148470?refId=S6MD3LZjc9RIHEzcNU35%2FQ%3D%3D&trackingId=tjSKQQqmSeXWZLB%2B7jFjiA%3D%3D&position=1&pageNum=0&trk=public_jobs_jserp-result_search-card
+IT Administrator (all genders)
+Next Big Thing AG
+Berlin, Berlin, Germany
+Hybrid
+1 day ago
+Linux, IT Hardware Support, IT sector, Information Technology, Mac, Network Printers, Offboarding, Printers, System Administration, Virtual Private Network (VPN)
+About the job
+        
+
+ 
+Job Description
+
+Imagine being part of the next tech revolution. As a member of the team, you will make a significant contribution to the development of new companies with technologies on the cutting edge. We are visionaries, we are entrepreneurs, we are specialists from a variety of fields. With our teams of engineers, designers, startup entrepreneurs, and industry specialists who have deep expertise and a clear vision, we are building a set of fast-growing companies that will change the way the world works in the decades to come. Join our team at Next Big Thing AG.
+
+As an IT Administrator (all genders), you take on an important, key position in the company and ensure that the hardware and software run smoothly. In addition, you are the contact person for all IT service issues and advise our employees and founders.
+
+What we offer you:
+You come to stay: whether full or part-time, Mac or Lenovo, together we are successful in the long runBenefit from flexible working hours and the possibility to work mobileIn addition to your 28 vacation days per year, you get 1/2 day off for your birthday, as well as Christmas and New Year's Eve off on topChoose your individual benefit package, whether you are a sports enthusiast, shopping icon or sustainable living - we have something for everyoneLook forward to a modern and newly equipped office directly at the Tiergarten S-Bahn station with (un)healthy snacks and a large selection of drinksWe make you fit: individual onboarding, regular in-house events and deep insights into the industries and technologies with which we shape the future
+
+Your responsibilities:
+Managing our Google Business environment and other systems such as Confluence, Jira, Notion, Microsoft 365, Slack, Miro, etc. Management of the company's network, including network printersIT support of our Windows 10/11, Linux and macOS clientsInstallation and configuration of the in-house hardware and softwareDocumentation of the IT landscape and IT processesTest and evaluation of new, innovative IT procedures e.g. for virtualization, Notion1st level support, as well as onboarding and offboarding with the HR team
+
+Requirements
+
+Your profession:
+You have sound IT knowledge, based on an apprenticeship, a degree or a comparable qualificationYou have already gained experience in the IT sectorYour written and spoken English skills are good, German is a plusProactive thinking, ability to work in a team and self-motivated action characterize youYour way of working is thorough, systematic and quality-conscious
+
+We value diversity and therefore expressly welcome all applications - regardless of gender, nationality, ethnic and social origin, religion/belief, physical abilities, age, sexual orientation and identity.
+
+That sounds exciting? We are always interested in working with excellent people. Apply now and be part of Next Big Thing AG. 
+
+https://de.linkedin.com/jobs/view/junior-it-system-administrator-m-f-d-in-berlin-at-renafan-gmbh-3492286962?refId=S6MD3LZjc9RIHEzcNU35%2FQ%3D%3D&trackingId=EA85eIzHlXhq3n4Cp%2FOM9A%3D%3D&position=2&pageNum=0&trk=public_jobs_jserp-result_search-card
+(Junior) IT System Administrator (m/f/d) in Berlin
+RENAFAN GmbH
+Berlin, Berlin, Germany
+On-site
+3 weeks ago
+Alcatel, File Services, Infrastructure Technologies, Internet Protocol Suite (TCP/IP), Office 365, Server Administration, Sophos, Terminal Server, Unified Threat Management, VMware vSphere
+About the job
+        
+ 
+
+
+
+      This job is sourced from a job board.
+      Learn more
+
+
+ 
+                  Without IT, we would not be able to place this job ad. So that we can invite you to an interview in the best case, we need an intact phone or even a PC that works.
+Nowadays, technology is indispensable and for this very reason we are looking for our IT team a
+(Junior) IT Administrator (m/f/d)
+for a full-time permanent position.
+You have no training in the IT field, but bits and bytes are still not foreign words for you? Perfect, because we still allow you a career with us.
+Look forward to...
+ the chance to make a career with us even without specific IT training.  a job in a crisis-proof industry  flat hierarchies with short decision-making paths  a sympathetic team with professional working atmosphere  very good public transport connection (U6 Borsigwerke, S25 Tegel)  personal and professional development opportunities through regular training, including at our in-house RENAFAN Academy.  Subsidies for company pension plan and capital-forming benefits  company health management (e.g. massages in the house)  Corporate benefits with more than 1000 partners 
+Your diverse field of activity
+ Operation, installation and configuration of servers and applications in a medium-sized IT system landscape (mainly Microsoft systems).  Contact person (m/f/d) in our second level support.  Analysis, identification and elimination of faults in IT operations.  Second level support as well as the documentation and thus ensuring the functionality and operational reliability of the server infrastructure.  Administration and support of the PBX (Alcatel and others) and LAN.  Cooperation in IT projects - rollouts, migrations, extensions and optimization of servers.  Support in the implementation of administrative tasks (backup, maintenance). 
+We are looking forward to...
+ a completed IT training or studies in the field of computer science is desirable, but not a MUST.  ideally professional experience in the administration of server and IT infrastructure technologies.  at best, you have knowledge and experience in the following areas: o MS Active Directory, Windows Terminal Server, DHCP, print and file services as well as Sharepoint and O365 o Microsoft operating systems (Windows 10 / Server 2012 -2019) o VMware vSphere o Networks, routing and firewall (TCP/IP, router, switch) - ideally Sophos UTM and HP Aruba o Mobile devices, printers and client and server hardware  If you also have strong conceptual and analytical thinking, a high level of service and customer orientation, a strong team spirit and very good communication skills, then you are the right person for us. 
+Interested?
+Apply now conveniently and quickly at www.renafan.jobs or by e-mail to: bewerbung@renafan.de
+Questions?
+Our personnel recruiting will be happy to answer them at 030 438 190 350.
+We look forward to receiving your application
+RENAFAN GmbH - Central applicant management - Berliner Straße 36/37 - 13507 Berlin 
+
