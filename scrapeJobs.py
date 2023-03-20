@@ -5,6 +5,8 @@ from selenium.webdriver.support.expected_conditions import visibility_of_element
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
 
+import pandas as pd
+
 import requests
 from bs4 import BeautifulSoup
 import time
@@ -16,9 +18,10 @@ import pickle
 # job_city = input("Enter city: ")
 # job_country = input("Enter job location: ")
 
-job_title = "Software developer"
-job_city = "Berlin"
+job_title = "it"
+job_city = "Weinsberg"
 job_country = "Germany"
+job_state="baden-Württemberg"
 
 
 
@@ -53,9 +56,12 @@ cookies = pickle.load(open("cookies.pkl", "rb"))
 for cookie in cookies:
     browser.add_cookie(cookie)
 browser.refresh()
-
+time.sleep(2) 
 # Construct the URL based on user inputs
-url = f"https://www.linkedin.com/jobs/search/?currentJobId=3456221826&geoId=103035651&keywords={job_title}&location={job_city}%2C%20{job_country}&refresh=true"
+#
+# testing
+url=f"https://www.linkedin.com/jobs/search/?currentJobId=3501167810&geoId=107182689&keywords={job_title}&location={job_city}%2C%20{job_state}%2C%20Germany&refresh=true"
+#url = f"https://www.linkedin.com/jobs/search/?currentJobId=3456221826&geoId=103035651&keywords={job_title}&location={job_city}%2C%20{job_country}&refresh=true"
 
 # Send a GET request with headers to mimic a web browser
 headers = {
@@ -85,7 +91,11 @@ browser.execute_script('window.scrollTo(0, 700)')
     iterate each link and gather information for each """
 
 tmp = 0
+complete_job_det=[]
 for job in job_links:
+    browser.execute_script('window.scrollTo(5, 500)') 
+    #tuple contains individual info for each job post
+    data_tup=()
     # get URL
     indv_url = job["href"]
     print(indv_url)
@@ -109,16 +119,21 @@ for job in job_links:
         class_="t-24 t-bold jobs-unified-top-card__job-title",
     ).text.strip()
     print(title)
+    data_tup=data_tup+(title,)
+
     company = soup.find(
         "span",
         class_="jobs-unified-top-card__company-name",
     ).text.strip()
     print(company)
+    data_tup=data_tup+(company,)
+
     location = soup.find(
         "span",
         class_="jobs-unified-top-card__bullet",
     ).text.strip()
     print(location)
+    data_tup=data_tup+(location,)
 
     workplace_type = soup.find(
         "span",
@@ -127,11 +142,16 @@ for job in job_links:
     if workplace_type is not None:
         workplace_type = workplace_type.text.strip()
         print(workplace_type)
+        data_tup=data_tup+(workplace_type,)
+    else:
+        data_tup=data_tup+("No work place info",)
+
     date_posted = soup.find(
         "span",
         class_="jobs-unified-top-card__posted-date",
     ).text.strip()
     print(date_posted)
+    data_tup=data_tup+(date_posted,)
 
     # To get skills we must click on more button 
     # Some profile have or dont have this section, test here 
@@ -147,21 +167,41 @@ for job in job_links:
         # remove /n and spaces from results
         cleaned_list = [item.strip() for item in skills_list]
         # create a readable string
-        result = ", ".join([item.strip() for item in cleaned_list])
-        print(result)
+        skills_result = ", ".join([item.strip() for item in cleaned_list])
+        print(skills_result)
+        data_tup=data_tup+(skills_result,)
     except NoSuchElementException:
         print("No skills section found.")
+        data_tup=data_tup+("No skills section found.",)
     
-
     main_details = soup.find(
         "div",
         class_="jobs-box__html-content jobs-description-content__text t-14 t-normal jobs-description-content__text--stretch",
     ).text.strip()
-    print(main_details, "\n")
-     
-    browser.execute_script('window.scrollTo(0, 700)') 
+    #print(main_details, "\n")
+    data_tup=data_tup+(main_details,)
+    browser.execute_script('window.scrollTo(0, 400)') 
 
+    #add all data into data frame
+    complete_job_det.append(data_tup)
     time.sleep(3)
     tmp += 1  # testing
-    if tmp == 1:  # testing
+    if tmp == 2:  # testing
         break
+
+
+#print("---------",df)
+
+
+#for testing data frame 
+pd.set_option('mode.chained_assignment', None)
+df=pd.DataFrame(complete_job_det)
+columns=['job_title','company_name','main_location','work_place_type','date_posted','skills','main_details']
+df.columns=columns
+df.to_csv('my_data.csv')
+
+# # Load the saved DataFrame from the file
+# df = pd.read_csv('my_data.csv')
+
+# # Print the loaded DataFrame
+#print(df)
