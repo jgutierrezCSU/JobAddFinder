@@ -3,36 +3,56 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.expected_conditions import visibility_of_element_located
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import NoSuchElementException
 
 import requests
 from bs4 import BeautifulSoup
 import time
 import localcred
+from csv import DictReader
+import pickle
 
-job_title = input("Enter job title: ")
-job_city = input("Enter city: ")
-job_country = input("Enter job location: ")
+# job_title = input("Enter job title: ")
+# job_city = input("Enter city: ")
+# job_country = input("Enter job location: ")
 
-# job_title = "Software developer"
-# job_city = "Berlin"
-# job_country = "Germany"
+job_title = "Software developer"
+job_city = "Berlin"
+job_country = "Germany"
+
+
+
+# So script wont always log user in and get detected, get cookies
+logging_in= input("Log in ? y/n: ")
+if logging_in == "y" :
+    browser = webdriver.Chrome()  # start a web browser
+    """ Opening linkedIn's login page & Log in """
+    browser.get("https://linkedin.com/uas/login")
+    # waiting for the page to load
+    wait = WebDriverWait(browser, 20)
+    username = wait.until(EC.visibility_of_element_located((By.NAME, "session_key")))
+    # print(browser.page_source)
+    username = browser.find_element(By.ID, "username")
+    username.send_keys(localcred.u_cred)
+    time.sleep(3)
+    # submit entries
+    pword = browser.find_element(By.ID, "password")
+    pword.send_keys(localcred.p_cred)
+    time.sleep(5)
+    # click the button
+    button = browser.find_element(By.XPATH, "//button[text()='Sign in']").click()
+    time.sleep(5) 
+    # steps to login
+    pickle.dump( browser.get_cookies() , open("cookies.pkl","wb"))
+    browser.close()
+    """ Logged in Now """
 
 browser = webdriver.Chrome()  # start a web browser
-
-""" Opening linkedIn's login page & Log in """
-browser.get("https://linkedin.com/uas/login")
-# waiting for the page to load
-wait = WebDriverWait(browser, 10)
-username = wait.until(EC.visibility_of_element_located((By.NAME, "session_key")))
-# print(browser.page_source)
-username = browser.find_element(By.ID, "username")
-username.send_keys(localcred.u_cred)
-# submit entries
-pword = browser.find_element(By.ID, "password")
-pword.send_keys(localcred.p_cred)
-# click the button
-button = browser.find_element(By.XPATH, "//button[text()='Sign in']").click()
-""" Logged in Now """
+browser.get('https://www.linkedin.com')
+cookies = pickle.load(open("cookies.pkl", "rb"))
+for cookie in cookies:
+    browser.add_cookie(cookie)
+browser.refresh()
 
 # Construct the URL based on user inputs
 url = f"https://www.linkedin.com/jobs/search/?currentJobId=3456221826&geoId=103035651&keywords={job_title}&location={job_city}%2C%20{job_country}&refresh=true"
@@ -58,6 +78,9 @@ for a in job_links:
     href = a["href"]
     # print(href)
 
+time.sleep(4.5) 
+browser.execute_script('window.scrollTo(0, 700)') 
+
 """ Now that we have all links from first page,
     iterate each link and gather information for each """
 
@@ -68,17 +91,13 @@ for job in job_links:
     print(indv_url)
 
     """ Navigate to each website and extract data"""
-    # retrieve fully rendered HTML content
-    time.sleep(5)
     browser.get(indv_url)  # navigate to URL
-    # print(indv_url)
-    time.sleep(2)
-
-    # To get skills we must click on more button
-    button = browser.find_element(
-        By.XPATH, "//button[@class='jobs-unified-top-card__job-insight-text-button']"
-    ).click()
-    time.sleep(1)
+    print(indv_url)
+    time.sleep(4)
+    # button = browser.find_element(
+    #     By.XPATH, "//button[@class='jobs-unified-top-card__job-insight-text-button']"
+    # ).click()
+    time.sleep(4)
     content = browser.page_source
     # print(content)
 
@@ -114,24 +133,35 @@ for job in job_links:
     ).text.strip()
     print(date_posted)
 
-    # SKILLS: get <ul> that has <li> containing all skills
-    ul = soup.find("ul", {"class": "job-details-skill-match-status-list"})
-    # now that I have <li> with skills,strip unnecessary chars
-    # remove "add" from results
-    skills_list = [li.text.strip().replace("Add", "") for li in ul.find_all("li")]
-    # remove /n and spaces from results
-    cleaned_list = [item.strip() for item in skills_list]
-    # create a readable string
-    result = ", ".join([item.strip() for item in cleaned_list])
-    print(result)
+    # To get skills we must click on more button 
+    # Some profile have or dont have this section, test here 
+    try:
+        #button = wait.until(EC.visibility_of_element_located((By.CLASS_NAME, "jobs-unified-top-card__job-insight-text-button")))
+        button = browser.find_element(By.CLASS_NAME, "jobs-unified-top-card__job-insight-text-button")
+        button.click()
+        # SKILLS: get <ul> that has <li> containing all skills
+        ul = soup.find("ul", {"class": "job-details-skill-match-status-list"})
+        # now that I have <li> with skills,strip unnecessary chars
+        # remove "add" from results
+        skills_list = [li.text.strip().replace("Add", "") for li in ul.find_all("li")]
+        # remove /n and spaces from results
+        cleaned_list = [item.strip() for item in skills_list]
+        # create a readable string
+        result = ", ".join([item.strip() for item in cleaned_list])
+        print(result)
+    except NoSuchElementException:
+        print("No skills section found.")
+    
 
     main_details = soup.find(
         "div",
         class_="jobs-box__html-content jobs-description-content__text t-14 t-normal jobs-description-content__text--stretch",
     ).text.strip()
     print(main_details, "\n")
+     
+    browser.execute_script('window.scrollTo(0, 700)') 
 
-    time.sleep(1)
+    time.sleep(3)
     tmp += 1  # testing
-    if tmp == 2:  # testing
+    if tmp == 1:  # testing
         break
