@@ -21,13 +21,12 @@ import pickle
 job_title = "it"
 job_city = "Weinsberg"
 job_country = "Germany"
-job_state="baden-Württemberg"
-
+job_state = "baden-Württemberg"
 
 
 # So script wont always log user in and get detected, get cookies
-logging_in= input("Log in ? y/n: ")
-if logging_in == "y" :
+logging_in = input("Log in ? y/n: ")
+if logging_in == "y":
     browser = webdriver.Chrome()  # start a web browser
     """ Opening linkedIn's login page & Log in """
     browser.get("https://linkedin.com/uas/login")
@@ -44,24 +43,24 @@ if logging_in == "y" :
     time.sleep(5)
     # click the button
     button = browser.find_element(By.XPATH, "//button[text()='Sign in']").click()
-    time.sleep(5) 
+    time.sleep(5)
     # steps to login
-    pickle.dump( browser.get_cookies() , open("cookies.pkl","wb"))
+    pickle.dump(browser.get_cookies(), open("cookies.pkl", "wb"))
     browser.close()
     """ Logged in Now """
 
 browser = webdriver.Chrome()  # start a web browser
-browser.get('https://www.linkedin.com')
+browser.get("https://www.linkedin.com")
 cookies = pickle.load(open("cookies.pkl", "rb"))
 for cookie in cookies:
     browser.add_cookie(cookie)
 browser.refresh()
-time.sleep(2) 
+time.sleep(2)
 # Construct the URL based on user inputs
 #
 # testing
-url=f"https://www.linkedin.com/jobs/search/?currentJobId=3501167810&geoId=107182689&keywords={job_title}&location={job_city}%2C%20{job_state}%2C%20Germany&refresh=true"
-#url = f"https://www.linkedin.com/jobs/search/?currentJobId=3456221826&geoId=103035651&keywords={job_title}&location={job_city}%2C%20{job_country}&refresh=true"
+url = f"https://www.linkedin.com/jobs/search/?currentJobId=3501167810&geoId=107182689&keywords={job_title}&location={job_city}%2C%20{job_state}%2C%20Germany&refresh=true"
+# url = f"https://www.linkedin.com/jobs/search/?currentJobId=3456221826&geoId=103035651&keywords={job_title}&location={job_city}%2C%20{job_country}&refresh=true"
 
 # Send a GET request with headers to mimic a web browser
 headers = {
@@ -84,18 +83,18 @@ for a in job_links:
     href = a["href"]
     # print(href)
 
-time.sleep(4.5) 
-browser.execute_script('window.scrollTo(0, 700)') 
+time.sleep(4.5)
+browser.execute_script("window.scrollTo(0, 700)")
 
 """ Now that we have all links from first page,
     iterate each link and gather information for each """
 
 tmp = 0
-complete_job_det=[]
+data = []
 for job in job_links:
-    browser.execute_script('window.scrollTo(5, 500)') 
-    #tuple contains individual info for each job post
-    data_tup=()
+    browser.execute_script("window.scrollTo(5, 500)")
+    # tuple contains individual info for each job post
+    data_tup = ()
     # get URL
     indv_url = job["href"]
     # print(indv_url)
@@ -104,13 +103,24 @@ for job in job_links:
     browser.get(indv_url)  # navigate to URL
     # print(indv_url)
     time.sleep(4)
-    # button = browser.find_element(
-    #     By.XPATH, "//button[@class='jobs-unified-top-card__job-insight-text-button']"
-    # ).click()
-    time.sleep(4)
-    content = browser.page_source
-    # print(content)
+    # press button to display Skills section
+    # Some profile have or dont have this section, test here
+    try:
+        wait = WebDriverWait(browser, 8)
+        button = wait.until(
+            EC.visibility_of_element_located(
+                (By.CLASS_NAME, "jobs-unified-top-card__job-insight-text-button")
+            )
+        )
+        button = browser.find_element(
+            By.XPATH,
+            "//button[@class='jobs-unified-top-card__job-insight-text-button']",
+        ).click()
+        time.sleep(3)
+    except:
+        pass
 
+    content = browser.page_source
     soup = BeautifulSoup(content, "html.parser")
     # print(soup)
     # Now that we general content , need to parse for specific details
@@ -119,21 +129,21 @@ for job in job_links:
         class_="t-24 t-bold jobs-unified-top-card__job-title",
     ).text.strip()
     print(title)
-    data_tup=data_tup+(title,)
+    data_tup = data_tup + (title,)
 
     company = soup.find(
         "span",
         class_="jobs-unified-top-card__company-name",
     ).text.strip()
     print(company)
-    data_tup=data_tup+(company,)
+    data_tup = data_tup + (company,)
 
     location = soup.find(
         "span",
         class_="jobs-unified-top-card__bullet",
     ).text.strip()
     print(location)
-    data_tup=data_tup+(location,)
+    data_tup = data_tup + (location,)
 
     workplace_type = soup.find(
         "span",
@@ -142,25 +152,20 @@ for job in job_links:
     if workplace_type is not None:
         workplace_type = workplace_type.text.strip()
         print(workplace_type)
-        data_tup=data_tup+(workplace_type,)
+        data_tup = data_tup + (workplace_type,)
     else:
-        data_tup=data_tup+("No work place info",)
+        data_tup = data_tup + ("No work place info",)
 
     date_posted = soup.find(
         "span",
         class_="jobs-unified-top-card__posted-date",
     ).text.strip()
     print(date_posted)
-    data_tup=data_tup+(date_posted,)
+    data_tup = data_tup + (date_posted,)
 
-    # To get skills we must click on more button 
-    # Some profile have or dont have this section, test here 
-    try:
-        #button = wait.until(EC.visibility_of_element_located((By.CLASS_NAME, "jobs-unified-top-card__job-insight-text-button")))
-        button = browser.find_element(By.CLASS_NAME, "jobs-unified-top-card__job-insight-text-button")
-        button.click()
-        # SKILLS: get <ul> that has <li> containing all skills
-        ul = soup.find("ul", {"class": "job-details-skill-match-status-list"})
+    # Skills: get <ul> that has <li> containing all skills
+    ul = soup.find("ul", {"class": "job-details-skill-match-status-list"})
+    if ul is not None:
         # now that I have <li> with skills,strip unnecessary chars
         # remove "add" from results
         skills_list = [li.text.strip().replace("Add", "") for li in ul.find_all("li")]
@@ -169,50 +174,44 @@ for job in job_links:
         # create a readable string
         skills_result = ", ".join([item.strip() for item in cleaned_list])
         print(skills_result)
-        data_tup=data_tup+(skills_result,)
-    except NoSuchElementException:
+        data_tup = data_tup + (skills_result,)
+    else:
         print("No skills section found.")
-        data_tup=data_tup+("No skills section found.",)
-    
+        data_tup = data_tup + ("No skills section found.",)
+
     main_details = soup.find(
         "div",
         class_="jobs-box__html-content jobs-description-content__text t-14 t-normal jobs-description-content__text--stretch",
     ).text.strip()
 
-    
     # clean \n
-    main_details=main_details.strip()
+    main_details = main_details.strip()
     # print(main_details, "\n")
 
-    data_tup=data_tup+(main_details,)
-    browser.execute_script('window.scrollTo(0, 400)') 
+    data_tup = data_tup + (main_details,)
+    browser.execute_script("window.scrollTo(0, 400)")
 
-    #add all data into data frame
-    complete_job_det.append(data_tup)
-   
-    #print(complete_job_det)
+    # add all data into data frame
+    data.append(data_tup)
+
+    # print(data)
     time.sleep(2)
     tmp += 1  # testing
     if tmp == 2:  # testing
         break
 
 
-#print("---------",df)
+# print("---------",df)
 
 
-#for testing data frame 
-#pd.set_option('mode.chained_assignment', None)
+# for testing data frame
+# pd.set_option('mode.chained_assignment', None)
 
-df=pd.DataFrame(complete_job_det)
-print(df)
-#columns=['job_title','company_name','main_location','work_place_type','date_posted','skills','main_details']
-#df.columns=columns
-df1 = df.iloc[:, 5] # Select columns by Index
-print(df1)
-df.to_csv('my_data.csv')
+df = pd.DataFrame(data)
+
+# columns=['job_title','company_name','main_location','work_place_type','date_posted','skills','main_details']
+# df.columns=columns
+df.to_csv("my_data.csv", index=False)
 
 # # Load the saved DataFrame from the file
-df = pd.read_csv('my_data.csv')
-df2 = df.iloc[:, 5] # Select columns by Index
-# # Print the loaded DataFrame
-print(df2)
+df = pd.read_csv("my_data.csv")
