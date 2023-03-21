@@ -19,6 +19,6 @@ Main job detail. <br>
 
 Code details: <br>
 Scripts prompts user if they want to manually login. If yes: <br>
-then tscript will access login details from a localcred.py file to login <br>
+then script will use login details from a localcred.py file to login <br>
 <br>
 Since not all job adds display the required skills, script will check for that w/ try catch. <br>

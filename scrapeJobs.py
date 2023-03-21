@@ -17,6 +17,21 @@ import pickle
 # job_title = input("Enter job title: ")
 # job_city = input("Enter city: ")
 # job_country = input("Enter job location: ")
+# 5=8k 10=18k 25=40k 50=80k 100=160
+distances = {8: 5, 18: 10, 40: 25, 80: 50, 160: 100}
+
+try:
+    distance_km = int(input("Enter distance in km (8 - 18 - 40 - 80 - 160): "))
+    if distance_km not in distances:
+        raise ValueError
+except ValueError:
+    print("Invalid input. Please enter a valid distance.")
+    distance = 5
+else:
+    distance = distances[distance_km]
+
+print(f"code choogitsen: {distance}")
+
 
 job_title = "it"
 job_city = "Weinsberg"
@@ -59,8 +74,8 @@ time.sleep(2)
 # Construct the URL based on user inputs
 #
 # testing
-url = f"https://www.linkedin.com/jobs/search/?currentJobId=3501167810&geoId=107182689&keywords={job_title}&location={job_city}%2C%20{job_state}%2C%20Germany&refresh=true"
-# url = f"https://www.linkedin.com/jobs/search/?currentJobId=3456221826&geoId=103035651&keywords={job_title}&location={job_city}%2C%20{job_country}&refresh=true"
+url = f"https://www.linkedin.com/jobs/search/?currentJobId=3501167810&distance={distance}&geoId=107182689&keywords={job_title}&location={job_city}%2C%20{job_state}%2C%20Germany&refresh=true"
+# url=f"https://www.linkedin.com/jobs/search/?currentJobId=3491470928&distance=5&geoId=107182689&keywords=it%20&location=Weinsberg%2C%20Baden-W%C3%BCrttemberg%2C%20Germany&refresh=true"
 
 # Send a GET request with headers to mimic a web browser
 headers = {
@@ -179,6 +194,13 @@ for job in job_links:
         print("No skills section found.")
         data_tup = data_tup + ("No skills section found.",)
 
+    # retrieve skills macthed
+    matched_skills = soup.find("h4", {"class": "t-bold t-16"})
+    if matched_skills is not None:
+        matched_skills = matched_skills.text.strip()
+        data_tup = data_tup + (matched_skills,)
+    else:
+        data_tup = data_tup + ("No matched skills",)
     main_details = soup.find(
         "div",
         class_="jobs-box__html-content jobs-description-content__text t-14 t-normal jobs-description-content__text--stretch",
@@ -200,7 +222,7 @@ for job in job_links:
     if tmp == 2:  # testing
         break
 
-
+browser.quit()
 # print("---------",df)
 
 
