@@ -98,11 +98,11 @@ for job in job_links:
     data_tup=()
     # get URL
     indv_url = job["href"]
-    print(indv_url)
+    # print(indv_url)
 
     """ Navigate to each website and extract data"""
     browser.get(indv_url)  # navigate to URL
-    print(indv_url)
+    # print(indv_url)
     time.sleep(4)
     # button = browser.find_element(
     #     By.XPATH, "//button[@class='jobs-unified-top-card__job-insight-text-button']"
@@ -178,13 +178,20 @@ for job in job_links:
         "div",
         class_="jobs-box__html-content jobs-description-content__text t-14 t-normal jobs-description-content__text--stretch",
     ).text.strip()
-    #print(main_details, "\n")
+
+    
+    # clean \n
+    main_details=main_details.strip()
+    # print(main_details, "\n")
+
     data_tup=data_tup+(main_details,)
     browser.execute_script('window.scrollTo(0, 400)') 
 
     #add all data into data frame
     complete_job_det.append(data_tup)
-    time.sleep(3)
+   
+    #print(complete_job_det)
+    time.sleep(2)
     tmp += 1  # testing
     if tmp == 2:  # testing
         break
@@ -194,14 +201,18 @@ for job in job_links:
 
 
 #for testing data frame 
-pd.set_option('mode.chained_assignment', None)
+#pd.set_option('mode.chained_assignment', None)
+
 df=pd.DataFrame(complete_job_det)
-columns=['job_title','company_name','main_location','work_place_type','date_posted','skills','main_details']
-df.columns=columns
+print(df)
+#columns=['job_title','company_name','main_location','work_place_type','date_posted','skills','main_details']
+#df.columns=columns
+df1 = df.iloc[:, 5] # Select columns by Index
+print(df1)
 df.to_csv('my_data.csv')
 
 # # Load the saved DataFrame from the file
-# df = pd.read_csv('my_data.csv')
-
+df = pd.read_csv('my_data.csv')
+df2 = df.iloc[:, 5] # Select columns by Index
 # # Print the loaded DataFrame
-#print(df)
+print(df2)
