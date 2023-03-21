@@ -6,6 +6,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
 
 import pandas as pd
+import re
 
 import requests
 from bs4 import BeautifulSoup
@@ -13,6 +14,11 @@ import time
 import localcred
 from csv import DictReader
 import pickle
+
+
+def randomize_move(b):
+    b.execute_script("window.scrollTo(10, 400)")
+
 
 # job_title = input("Enter job title: ")
 # job_city = input("Enter city: ")
@@ -30,7 +36,7 @@ except ValueError:
 else:
     distance = distances[distance_km]
 
-print(f"code choogitsen: {distance}")
+print(f"code choosen: {distance}")
 
 
 job_title = "it"
@@ -44,11 +50,11 @@ logging_in = input("Log in ? y/n: ")
 if logging_in == "y":
     browser = webdriver.Chrome()  # start a web browser
     """ Opening linkedIn's login page & Log in """
+    randomize_move(browser)
     browser.get("https://linkedin.com/uas/login")
     # waiting for the page to load
     wait = WebDriverWait(browser, 20)
     username = wait.until(EC.visibility_of_element_located((By.NAME, "session_key")))
-    # print(browser.page_source)
     username = browser.find_element(By.ID, "username")
     username.send_keys(localcred.u_cred)
     time.sleep(3)
@@ -86,20 +92,18 @@ front_page_response = requests.get(url, headers=headers)
 
 # Parse the HTML response using BeautifulSoup , make it nicer so we can search it
 soup = BeautifulSoup(front_page_response.content, "html.parser")
-# print(soup)
 
 # Extract link listings from the parsed HTML by extracting elements
 job_links = soup.find_all(
     "a", class_="base-card__full-link absolute top-0 right-0 bottom-0 left-0 p-0 z-[2]"
 )
 
-# Loop through the list of elements and print the href attribute of each one (get links)
+# Loop through the list of elements (get links)
 for a in job_links:
     href = a["href"]
-    # print(href)
 
 time.sleep(4.5)
-browser.execute_script("window.scrollTo(0, 700)")
+randomize_move(browser)
 
 """ Now that we have all links from first page,
     iterate each link and gather information for each """
@@ -107,16 +111,14 @@ browser.execute_script("window.scrollTo(0, 700)")
 tmp = 0
 data = []
 for job in job_links:
-    browser.execute_script("window.scrollTo(5, 500)")
+    randomize_move(browser)
     # tuple contains individual info for each job post
     data_tup = ()
     # get URL
     indv_url = job["href"]
-    # print(indv_url)
 
     """ Navigate to each website and extract data"""
     browser.get(indv_url)  # navigate to URL
-    # print(indv_url)
     time.sleep(4)
     # press button to display Skills section
     # Some profile have or dont have this section, test here
@@ -137,27 +139,23 @@ for job in job_links:
 
     content = browser.page_source
     soup = BeautifulSoup(content, "html.parser")
-    # print(soup)
     # Now that we general content , need to parse for specific details
     title = soup.find(
         "h1",
         class_="t-24 t-bold jobs-unified-top-card__job-title",
     ).text.strip()
-    print(title)
     data_tup = data_tup + (title,)
 
     company = soup.find(
         "span",
         class_="jobs-unified-top-card__company-name",
     ).text.strip()
-    print(company)
     data_tup = data_tup + (company,)
 
     location = soup.find(
         "span",
         class_="jobs-unified-top-card__bullet",
     ).text.strip()
-    print(location)
     data_tup = data_tup + (location,)
 
     workplace_type = soup.find(
@@ -166,7 +164,6 @@ for job in job_links:
     )
     if workplace_type is not None:
         workplace_type = workplace_type.text.strip()
-        print(workplace_type)
         data_tup = data_tup + (workplace_type,)
     else:
         data_tup = data_tup + ("No work place info",)
@@ -175,7 +172,6 @@ for job in job_links:
         "span",
         class_="jobs-unified-top-card__posted-date",
     ).text.strip()
-    print(date_posted)
     data_tup = data_tup + (date_posted,)
 
     # Skills: get <ul> that has <li> containing all skills
@@ -188,10 +184,8 @@ for job in job_links:
         cleaned_list = [item.strip() for item in skills_list]
         # create a readable string
         skills_result = ", ".join([item.strip() for item in cleaned_list])
-        print(skills_result)
         data_tup = data_tup + (skills_result,)
     else:
-        print("No skills section found.")
         data_tup = data_tup + ("No skills section found.",)
 
     # retrieve skills macthed
@@ -201,6 +195,7 @@ for job in job_links:
         data_tup = data_tup + (matched_skills,)
     else:
         data_tup = data_tup + ("No matched skills",)
+
     main_details = soup.find(
         "div",
         class_="jobs-box__html-content jobs-description-content__text t-14 t-normal jobs-description-content__text--stretch",
@@ -208,32 +203,63 @@ for job in job_links:
 
     # clean \n
     main_details = main_details.strip()
-    # print(main_details, "\n")
 
     data_tup = data_tup + (main_details,)
-    browser.execute_script("window.scrollTo(0, 400)")
+
+    # add link at last column
+    data_tup = data_tup + (indv_url,)
+    randomize_move(browser)
 
     # add all data into data frame
     data.append(data_tup)
 
-    # print(data)
     time.sleep(2)
     tmp += 1  # testing
-    if tmp == 2:  # testing
+    if tmp == 20:  # testing
         break
 
 browser.quit()
-# print("---------",df)
+
+""" Working with Data Frames """
 
 
-# for testing data frame
-# pd.set_option('mode.chained_assignment', None)
+def calculate_ranking(text):
+    matches = re.findall(r"\d+", text)
 
+    if len(matches) == 2:
+        numerator, denominator = map(int, matches)
+        # Calculate the ranking rating
+        return numerator / denominator
+    else:
+        return 0.0
+
+
+# insert gathered data to data frame
 df = pd.DataFrame(data)
 
-# columns=['job_title','company_name','main_location','work_place_type','date_posted','skills','main_details']
-# df.columns=columns
+df.to_csv("my_data.csv", index=False)
+
+columns = [
+    "job_title",
+    "company_name",
+    "main_location",
+    "work_place_type",
+    "date_posted",
+    "skills",
+    "matched_skills",
+    "main_details",
+    "link",
+]
+df.columns = columns
+# Apply the function to the 'Skills' column and create a new 'Ranking' column
+df["ranking"] = df["matched_skills"].apply(calculate_ranking)
+
+# "ranking" column is now sorted in descending order while keeping the "main_location" column sorted in ascending order.
+df = df.sort_values(["main_location", "ranking"], ascending=[True, False])
+# Print the result
+print(df)
+
 df.to_csv("my_data.csv", index=False)
 
 # # Load the saved DataFrame from the file
-df = pd.read_csv("my_data.csv")
+# df = pd.read_csv("my_data.csv")
