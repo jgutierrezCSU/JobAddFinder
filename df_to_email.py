@@ -66,9 +66,6 @@ def create_html_file(df):
         f.write(html_table)
 
 
-# Define the email function (dont call it email!)
-
-
 def send_emails(df, email_to):
     # prep/save localy data
     create_html_file(df)
@@ -113,8 +110,6 @@ def send_emails(df, email_to):
             "Content-Disposition", "attachment; filename= " + filename
         )
         msg.attach(attachment_package)
-
-        # # Cast as string
         text = msg.as_string()
 
         # Connect with the server

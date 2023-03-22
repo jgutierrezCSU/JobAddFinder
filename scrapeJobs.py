@@ -21,9 +21,13 @@ def randomize_move(b):
     b.execute_script("window.scrollTo(10, 400)")
 
 
+# uncomment for user input
 # job_title = input("Enter job title: ")
 # job_city = input("Enter city: ")
 # job_country = input("Enter job location: ")
+# num_of_jobs = input("Enter number of jobs to get: ")
+# email_to=input("Email to send to: ")
+
 # 5=8k 10=18k 25=40k 50=80k 100=160
 distances = {8: 5, 18: 10, 40: 25, 80: 50, 160: 100}
 
@@ -37,11 +41,13 @@ except ValueError:
 else:
     distance = distances[distance_km]
 
-
+# fixed variables, comment for user input
 job_title = "it"
 job_city = "Weinsberg"
 job_country = "Germany"
 job_state = "baden-Württemberg"
+num_of_jobs = 30
+email_to = ["jesusg714@gmail.com"]  # can send to multiple emails
 
 
 # So script wont always log user in and get detected, get cookies
@@ -76,9 +82,8 @@ for cookie in cookies:
     browser.add_cookie(cookie)
 browser.refresh()
 time.sleep(2)
+
 # Construct the URL based on user inputs
-#
-# testing
 url = f"https://www.linkedin.com/jobs/search/?currentJobId=3501167810&distance={distance}&geoId=107182689&keywords={job_title}&location={job_city}%2C%20{job_state}%2C%20Germany&refresh=true"
 
 # Send a GET request with headers to mimic a web browser
@@ -86,7 +91,6 @@ headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
 }
 front_page_response = requests.get(url, headers=headers)
-# print(response)
 
 # Parse the HTML response using BeautifulSoup , make it nicer so we can search it
 soup = BeautifulSoup(front_page_response.content, "html.parser")
@@ -212,9 +216,11 @@ for job in job_links:
     data.append(data_tup)
 
     time.sleep(2)
-    tmp += 1  # testing
-    if tmp == 1:  # testing
+    tmp += 1
+    # uncomment for user input
+    if tmp == num_of_jobs:
         break
+
 
 browser.quit()
 
@@ -223,5 +229,4 @@ browser.quit()
 # insert gathered data to data frame
 df = pd.DataFrame(data)
 df = df_to_email.clean_data(df)
-email_to = ["jesusg714@gmail.com"]  # can send to multiple emails
 df_to_email.send_emails(df, email_to)
