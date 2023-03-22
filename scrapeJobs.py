@@ -7,13 +7,14 @@ from selenium.common.exceptions import NoSuchElementException
 
 import pandas as pd
 import re
-
 import requests
 from bs4 import BeautifulSoup
 import time
 import localcred
 from csv import DictReader
 import pickle
+
+import df_to_email
 
 
 def randomize_move(b):
@@ -35,8 +36,6 @@ except ValueError:
     distance = 5
 else:
     distance = distances[distance_km]
-
-print(f"code choosen: {distance}")
 
 
 job_title = "it"
@@ -81,7 +80,6 @@ time.sleep(2)
 #
 # testing
 url = f"https://www.linkedin.com/jobs/search/?currentJobId=3501167810&distance={distance}&geoId=107182689&keywords={job_title}&location={job_city}%2C%20{job_state}%2C%20Germany&refresh=true"
-# url=f"https://www.linkedin.com/jobs/search/?currentJobId=3491470928&distance=5&geoId=107182689&keywords=it%20&location=Weinsberg%2C%20Baden-W%C3%BCrttemberg%2C%20Germany&refresh=true"
 
 # Send a GET request with headers to mimic a web browser
 headers = {
@@ -215,51 +213,15 @@ for job in job_links:
 
     time.sleep(2)
     tmp += 1  # testing
-    if tmp == 20:  # testing
+    if tmp == 1:  # testing
         break
 
 browser.quit()
 
 """ Working with Data Frames """
 
-
-def calculate_ranking(text):
-    matches = re.findall(r"\d+", text)
-
-    if len(matches) == 2:
-        numerator, denominator = map(int, matches)
-        # Calculate the ranking rating
-        return numerator / denominator
-    else:
-        return 0.0
-
-
 # insert gathered data to data frame
 df = pd.DataFrame(data)
-
-df.to_csv("my_data.csv", index=False)
-
-columns = [
-    "job_title",
-    "company_name",
-    "main_location",
-    "work_place_type",
-    "date_posted",
-    "skills",
-    "matched_skills",
-    "main_details",
-    "link",
-]
-df.columns = columns
-# Apply the function to the 'Skills' column and create a new 'Ranking' column
-df["ranking"] = df["matched_skills"].apply(calculate_ranking)
-
-# "ranking" column is now sorted in descending order while keeping the "main_location" column sorted in ascending order.
-df = df.sort_values(["main_location", "ranking"], ascending=[True, False])
-# Print the result
-print(df)
-
-df.to_csv("my_data.csv", index=False)
-
-# # Load the saved DataFrame from the file
-# df = pd.read_csv("my_data.csv")
+df = df_to_email.clean_data(df)
+email_to = ["jesusg714@gmail.com"]  # can send to multiple emails
+df_to_email.send_emails(df, email_to)
