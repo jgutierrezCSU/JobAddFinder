@@ -18,7 +18,7 @@ import df_to_email
 
 
 def randomize_move(b):
-    b.execute_script("window.scrollTo(10, 400)")
+    b.execute_script("window.scrollTo(10, 900)")
 
 
 # uncomment for user input
@@ -83,26 +83,31 @@ for cookie in cookies:
 browser.refresh()
 time.sleep(2)
 
-# Construct the URL based on user inputs
-url = f"https://www.linkedin.com/jobs/search/?currentJobId=3501167810&distance={distance}&geoId=107182689&keywords={job_title}&location={job_city}%2C%20{job_state}%2C%20Germany&refresh=true"
+# search all pages
+job_links = []
+for page_num in range(1, 15):
+    randomize_move(browser)
+    time.sleep(3)
+    # Construct the URL based on user inputs
+    url = f"https://www.linkedin.com/jobs/search/?currentJobId=3501167810&distance={distance}&geoId=107182689&keywords={job_title}&location={job_city}%2C%20{job_state}%2C%20Germany&refresh=true&start={25 * (page_num - 1)}"
 
-# Send a GET request with headers to mimic a web browser
-headers = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
-}
-front_page_response = requests.get(url, headers=headers)
+    # Send a GET request with headers to mimic a web browser
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
+    }
+    front_page_response = requests.get(url, headers=headers)
 
-# Parse the HTML response using BeautifulSoup , make it nicer so we can search it
-soup = BeautifulSoup(front_page_response.content, "html.parser")
+    # Parse the HTML response using BeautifulSoup , make it nicer so we can search it
+    soup = BeautifulSoup(front_page_response.content, "html.parser")
 
-# Extract link listings from the parsed HTML by extracting elements
-job_links = soup.find_all(
-    "a", class_="base-card__full-link absolute top-0 right-0 bottom-0 left-0 p-0 z-[2]"
-)
+    # Extract link listings from the parsed HTML by extracting elements
+    job_links.extend(
+        soup.find_all(
+            "a",
+            class_="base-card__full-link absolute top-0 right-0 bottom-0 left-0 p-0 z-[2]",
+        )
+    )
 
-# Loop through the list of elements (get links)
-for a in job_links:
-    href = a["href"]
 
 time.sleep(4.5)
 randomize_move(browser)

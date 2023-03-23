@@ -44,9 +44,6 @@ def clean_data(df):
 
     # "ranking" column is now sorted in descending order while keeping the "main_location" column sorted in ascending order.
     df = df.sort_values(["main_location", "ranking"], ascending=[True, False])
-    # Print the result
-    # print(df[["job_title", "company_name", "main_location", "ranking", "link"]])
-    # df.to_csv("trash.csv", index=False)
     return df
 
 
@@ -129,3 +126,7 @@ def send_emails(df, email_to):
 
     # Close the port
     TIE_server.quit()
+
+
+# for page_num in range(1, 15):
+#     print(25 * (page_num - 1))
