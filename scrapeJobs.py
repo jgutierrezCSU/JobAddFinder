@@ -25,8 +25,18 @@ def randomize_move(b):
 # job_title = input("Enter job title: ")
 # job_city = input("Enter city: ")
 # job_country = input("Enter job location: ")
-# num_of_jobs = input("Enter number of jobs to get: ")
+# num_of_jobs = input("Enter max number of jobs to get: ")
+
 # email_to=input("Email to send to: ")
+
+# This code takes user input and assigns the appropriate page number based on the range of input. 
+num_of_jobs = int(input("Enter max number of jobs to get (1-100): "))
+
+if num_of_jobs < 1 or num_of_jobs > 100:
+    print("Invalid input! Please enter a number between 1 and 100.")
+else:
+    page = (num_of_jobs - 1) // 25 + 1
+
 
 # 5=8k 10=18k 25=40k 50=80k 100=160
 distances = {8: 5, 18: 10, 40: 25, 80: 50, 160: 100}
@@ -46,7 +56,7 @@ job_title = "it"
 job_city = "Weinsberg"
 job_country = "Germany"
 job_state = "baden-Württemberg"
-num_of_jobs = 30
+#num_of_jobs = 30
 email_to = ["jesusg714@gmail.com"]  # can send to multiple emails
 
 
@@ -85,10 +95,13 @@ time.sleep(2)
 
 # search all pages
 job_links = []
-for page_num in range(1, 15):
+
+for page_num in range(1, page+1):
     randomize_move(browser)
     time.sleep(3)
     # Construct the URL based on user inputs
+    #example
+    #https://www.linkedin.com/jobs/search/?currentJobId=3501167810&distance=50&geoId=107182689&keywords=it%7D&location=weinsberg%2C%20baden-W%C3%BCrttemberg%2C%20Germany&refresh=true&start=0
     url = f"https://www.linkedin.com/jobs/search/?currentJobId=3501167810&distance={distance}&geoId=107182689&keywords={job_title}&location={job_city}%2C%20{job_state}%2C%20Germany&refresh=true&start={25 * (page_num - 1)}"
 
     # Send a GET request with headers to mimic a web browser
@@ -145,6 +158,7 @@ for job in job_links:
         pass
 
     content = browser.page_source
+    time.sleep(2)
     soup = BeautifulSoup(content, "html.parser")
     # Now that we general content , need to parse for specific details
     title = soup.find(
@@ -222,7 +236,7 @@ for job in job_links:
 
     time.sleep(2)
     tmp += 1
-    # uncomment for user input
+    
     if tmp == num_of_jobs:
         break
 
