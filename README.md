@@ -48,34 +48,38 @@ This script uses the following libraries:
 
 ## Installation
 
-### Windows
+### Windows 
 
 1. Install Python 3.x from the official website.
 2. Install Selenium WebDriver using the following command in the command prompt:
 
     ```
-    pip install selenium
+    py -m pip install selenium
     ```
 
 3. Install pandas using the following command in the command prompt:
 
     ```
-    pip install pandas
+    py -m pip install pandas
     ```
 
 4. Install requests using the following command in the command prompt:
 
     ```
-    pip install requests
+    py -m pip install requests
     ```
 
 5. Install BeautifulSoup using the following command in the command prompt:
 
     ```
-    pip install beautifulsoup4
+    py -m pip install beautifulsoup4
     ```
+6. Install Progressbar via cmd:
 
-6. Create a localcred.py file and define your credentials as needed.
+    ```
+    py -m pip install progress progressbar2 alive-progress tqdm
+
+7. Create a localcred.py file and define your credentials as needed.
 
 ### Linux
 
@@ -103,8 +107,12 @@ This script uses the following libraries:
     ```
     pip3 install beautifulsoup4
     ```
+6. Install Progressbar via terminal:
 
-6. Create a localcred.py file and define your credentials as needed.
+    ```
+    pip3 install progress progressbar2 alive-progress tqdm
+    ```
+7. Create a localcred.py file and define your credentials as needed.
 
 ## Credentials
 

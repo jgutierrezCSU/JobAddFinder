@@ -10,7 +10,11 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email import encoders
 
+from tqdm import tqdm
+from time import sleep
 import unicodedata
+
+#for installing packages on cmd : py -m pip install ...
 
 
 def calculate_ranking(text):
@@ -84,7 +88,7 @@ def create_html_file(df):
     html_table = html_table.replace('<th>concatenated_text</th>', '<th style="width:30%;">concatenated_text</th>')
     html_table = html_table.replace('<td>', '<td style="max-width:300px;word-wrap:break-word;">')
     html_table = html_table.replace('<a ', '<a style="word-wrap:break-word;" ')
-    with open("results2.html", "w") as f:
+    with open("results.html", "w") as f:
         f.write(f'<style>table tr td:first-child {{width: 10px;}}</style>\n')
         f.write(html_table)
 
@@ -93,8 +97,6 @@ def send_emails(df, email_to):
     # prep/save localy data
     create_html_file(df)
     
-
-
     # Setup port number and server name
     smtp_port = 587  # Standard secure SMTP port
     smtp_server = "smtp.gmail.com"  # Google SMTP Server
@@ -230,3 +232,28 @@ def send_emails(df, email_to):
 # # # Save the HTML to a file
 # # with open("results2.html", "w") as f:
 # #     f.write(df)
+
+
+# for i in tqdm(range(100)):
+#     sleep(0.02)
+
+# # Create a list with 10 variables
+# my_list = [1, 2, 3, "four", 5.5, "six", True, None, [7, 8, 9], {"ten": 10}]
+
+# # Loop through the list and print each variable
+# for var in tqdm(my_list):
+#     pass
+#     # print(var)
+
+
+# for _ in range(20):
+#     # This code takes user input and assigns the appropriate page number based on the range of input. 
+#     num_of_jobs = int(input("Enter max number of jobs to get (1-100): "))
+
+#     if num_of_jobs < 1 or num_of_jobs > 100:
+#         print("Invalid input! Please enter a number between 1 and 100.")
+#     else:
+#         page = (num_of_jobs - 1) // 25 + 1
+
+
+#     print(page)

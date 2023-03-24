@@ -11,8 +11,9 @@ import requests
 from bs4 import BeautifulSoup
 import time
 import localcred
-from csv import DictReader
 import pickle
+from tqdm import tqdm
+from time import sleep
 
 import df_to_email
 
@@ -97,6 +98,7 @@ time.sleep(2)
 job_links = []
 
 for page_num in range(1, page+1):
+    print("page_num :",page_num)
     randomize_move(browser)
     time.sleep(3)
     # Construct the URL based on user inputs
@@ -121,7 +123,7 @@ for page_num in range(1, page+1):
         )
     )
 
-
+print("job_links ",len(job_links))
 time.sleep(4.5)
 randomize_move(browser)
 
@@ -130,7 +132,9 @@ randomize_move(browser)
 
 tmp = 0
 data = []
-for job in job_links:
+for job in tqdm(job_links):
+# for job in tqdm(job_links):
+    print(",,,,,",tmp)
     randomize_move(browser)
     # tuple contains individual info for each job post
     data_tup = ()
