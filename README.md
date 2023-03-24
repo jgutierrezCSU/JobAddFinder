@@ -30,9 +30,13 @@ doing this will load cookies from previous ranned script and load them to browse
 <br>
 Distance" input: allows the user to input a distance in kilometers,the code sets the distance to a default value of 8 km radius<br>
 <br>
+Script prompts the user to enter a sort by category, and then sorts the end result based on the user's input<br>
+<br>
 Since not all job adds display the required skills, script will check for that w/ try catch. <br>
 <br>
 If "skills needed" is present then "ranking" will be calculated, a ratio of "number of matched skills"<br>
+<br>
+After user input ,a DataFrame is creates as an HTML file with a table representation of the data. The function applies encoding to the DataFrame for email purposes and adds styling features to adjust the column width and prevent overlapping of cell contents. Finally, it saves the HTML file locally.
 <br>
 Email sending: The function then sets up the SMTP port number and server name for the Gmail SMTP server, and defines the email address to send the email from, as well as the email subject.the send_emails function sends an email with an attached HTML file to each email address in the email_to list using the Gmail SMTP server. The HTML file is generated from the df data and saved locally.<br>
 

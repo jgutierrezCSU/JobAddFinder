@@ -28,8 +28,8 @@ def calculate_ranking(text):
         return 0.0
 
 
-def clean_data(df):
-
+def clean_data(df,user_choice):
+   
     columns = [
         "JOB_TITLE",
         "COMPANY_NAME",
@@ -47,17 +47,18 @@ def clean_data(df):
     df["RANKING"] = df["MATCHED_SKILLS"].apply(calculate_ranking)
     # Use insert() to move the 'RANKING' column to the second position
     df.insert(1, "RANKING", df.pop("RANKING"))
-
-    # "RANKING" column is now sorted in descending order while keeping the "MAIN_LOCATION" column sorted in ascending order.
-    df = df.sort_values(["MAIN_LOCATION", "RANKING"], ascending=[True, False])
+    if user_choice is not None:
+        # "RANKING" column is now SORTED in descending order while keeping the "MAIN_LOCATION" column sorted in ascending order.
+        df = df.sort_values([user_choice], ascending=[False])
 
     #save raw df locally before creating just 3 columns
     df.to_csv('my_data_raw.csv', index=False)
 
     # Concatenate column names and text into a single column, excluding column "main_datails" , can also put a list of columns
-    df['concatenated_text'] = df.apply(lambda row: '<br><br>'.join([f"{col}: {str(row[col])}" for col in df.columns if col != 'MAIN_DETAILS']), axis=1)
+    df['SUM_DETAILS'] = df.apply(lambda row: '<br><br>'.join([f"{col}: {str(row[col])}" for col in df.columns if col != 'MAIN_DETAILS']), axis=1)
+
     #create df with 2 columns
-    df = pd.DataFrame({"concatenated_text": df["concatenated_text"], "MAIN_DETAILS": df["MAIN_DETAILS"]})
+    df = pd.DataFrame({"SUM_DETAILS": df["SUM_DETAILS"], "MAIN_DETAILS": df["MAIN_DETAILS"]})
 
     #save  df localy w/ 2 columns
     df.to_csv('my_data_sorted.csv', index=False)
@@ -85,7 +86,7 @@ def create_html_file(df):
     # Add CSS styling to adjust column width and prevent overlapping
     html_table = html_table.replace('<table', '<table style="table-layout:fixed;width:100%;"')
     html_table = html_table.replace('<th></th>', '<th style="width:22px;"></th>')
-    html_table = html_table.replace('<th>concatenated_text</th>', '<th style="width:30%;">concatenated_text</th>')
+    html_table = html_table.replace('<th>SUM_DETAILS</th>', '<th style="width:30%;">SUM_DETAILS</th>')
     html_table = html_table.replace('<td>', '<td style="max-width:300px;word-wrap:break-word;">')
     html_table = html_table.replace('<a ', '<a style="word-wrap:break-word;" ')
     with open("results.html", "w") as f:
@@ -215,7 +216,7 @@ def send_emails(df, email_to):
 #     # Add CSS styling to adjust column width and prevent overlapping
 #     html_table = html_table.replace('<table', '<table style="table-layout:fixed;width:100%;"')
 #     html_table = html_table.replace('<th></th>', '<th style="width:20px;"></th>')
-#     html_table = html_table.replace('<th>concatenated_text</th>', '<th style="width:30%;">concatenated_text</th>')
+#     html_table = html_table.replace('<th>SUM_DETAILS</th>', '<th style="width:30%;">SUM_DETAILS</th>')
 #     html_table = html_table.replace('<td>', '<td style="max-width:300px;word-wrap:break-word;">')
 #     html_table = html_table.replace('<a ', '<a style="word-wrap:break-word;" ')
 #     with open("results2.html", "w") as f:

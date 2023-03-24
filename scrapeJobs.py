@@ -52,6 +52,17 @@ except ValueError:
 else:
     distance = distances[distance_km]
 
+
+options = ["job title", "company name", "main location", "work place type", "date posted", "skills"]
+user_choice = input(f"Sort by? options: {', '.join(options)}\n")
+if user_choice in options:
+    #clean leadin ending spaces and insert _
+    user_choice=user_choice.strip().replace(" ", "_")
+    user_choice= user_choice.upper()
+else:
+    print("Invalid choice. No sorting will be applied")
+    user_choice= None
+
 # fixed variables, comment for user input
 job_title = "it"
 job_city = "Weinsberg"
@@ -98,7 +109,7 @@ time.sleep(2)
 job_links = []
 
 for page_num in range(1, page+1):
-    print("page_num :",page_num)
+    #print("page_num :",page_num)
     randomize_move(browser)
     time.sleep(3)
     # Construct the URL based on user inputs
@@ -134,7 +145,7 @@ tmp = 0
 data = []
 for job in tqdm(job_links):
 # for job in tqdm(job_links):
-    print(",,,,,",tmp)
+    #print(",,,,,",tmp)
     randomize_move(browser)
     # tuple contains individual info for each job post
     data_tup = ()
@@ -251,5 +262,5 @@ browser.quit()
 
 # insert gathered data to data frame
 df = pd.DataFrame(data)
-df = df_to_email.clean_data(df)
+df = df_to_email.clean_data(df,user_choice)
 df_to_email.send_emails(df, email_to)
