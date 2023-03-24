@@ -80,7 +80,7 @@ def create_html_file(df):
     
     # Add CSS styling to adjust column width and prevent overlapping
     html_table = html_table.replace('<table', '<table style="table-layout:fixed;width:100%;"')
-    html_table = html_table.replace('<th></th>', '<th style="width:10px;"></th>')
+    html_table = html_table.replace('<th></th>', '<th style="width:22px;"></th>')
     html_table = html_table.replace('<th>concatenated_text</th>', '<th style="width:30%;">concatenated_text</th>')
     html_table = html_table.replace('<td>', '<td style="max-width:300px;word-wrap:break-word;">')
     html_table = html_table.replace('<a ', '<a style="word-wrap:break-word;" ')
@@ -108,8 +108,8 @@ def send_emails(df, email_to):
 
         # Make the body of the email
         body = f"""
-        Results file in html (click and should open in seperate window). 
-        2 Additional raw .csv file were saved localy
+        Results file in html (click to open in seperate window). 
+        2 Additional raw .csv file were saved locally
         """
 
         # make a MIME object to define parts of the email
@@ -212,7 +212,7 @@ def send_emails(df, email_to):
     
 #     # Add CSS styling to adjust column width and prevent overlapping
 #     html_table = html_table.replace('<table', '<table style="table-layout:fixed;width:100%;"')
-#     html_table = html_table.replace('<th></th>', '<th style="width:10px;"></th>')
+#     html_table = html_table.replace('<th></th>', '<th style="width:20px;"></th>')
 #     html_table = html_table.replace('<th>concatenated_text</th>', '<th style="width:30%;">concatenated_text</th>')
 #     html_table = html_table.replace('<td>', '<td style="max-width:300px;word-wrap:break-word;">')
 #     html_table = html_table.replace('<a ', '<a style="word-wrap:break-word;" ')
@@ -223,10 +223,10 @@ def send_emails(df, email_to):
 
 
 # # read CSV file and create HTML file
-# df=pd.read_csv('my_data_w-colm.csv')
+# df=pd.read_csv('my_data_sorted.csv')
 # create_html_file2(df)
 
 
-# # Save the HTML to a file
-# with open("results2.html", "w") as f:
-#     f.write(df)
+# # # Save the HTML to a file
+# # with open("results2.html", "w") as f:
+# #     f.write(df)
