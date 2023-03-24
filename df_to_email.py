@@ -18,7 +18,7 @@ def calculate_ranking(text):
 
     if len(matches) == 2:
         numerator, denominator = map(int, matches)
-        # Calculate the ranking rating
+        # Calculate the RANKING rating
         return numerator / denominator
     else:
         return 0.0
@@ -27,31 +27,36 @@ def calculate_ranking(text):
 def clean_data(df):
 
     columns = [
-        "job_title",
-        "company_name",
-        "main_location",
-        "work_place_type",
-        "date_posted",
-        "skills",
-        "matched_skills",
-        "main_details",
-        "link",
+        "JOB_TITLE",
+        "COMPANY_NAME",
+        "MAIN_LOCATION",
+        "WORK_PLACE_TYPE",
+        "DATE_POSTED",
+        "SKILLS",
+        "MATCHED_SKILLS",
+        "MAIN_DETAILS",
+        "LINK",
     ]
     df.columns = columns
 
-    # Apply the function to the 'Skills' column and create a new 'Ranking' column
-    df["ranking"] = df["matched_skills"].apply(calculate_ranking)
-    # Use insert() to move the 'Ranking' column to the second position
-    df.insert(1, "ranking", df.pop("ranking"))
+    # Apply the function to the 'SKILLS' column and create a new 'RANKING' column
+    df["RANKING"] = df["MATCHED_SKILLS"].apply(calculate_ranking)
+    # Use insert() to move the 'RANKING' column to the second position
+    df.insert(1, "RANKING", df.pop("RANKING"))
 
-    # "ranking" column is now sorted in descending order while keeping the "main_location" column sorted in ascending order.
-    df = df.sort_values(["main_location", "ranking"], ascending=[True, False])
+    # "RANKING" column is now sorted in descending order while keeping the "MAIN_LOCATION" column sorted in ascending order.
+    df = df.sort_values(["MAIN_LOCATION", "RANKING"], ascending=[True, False])
+
+    #save raw df locally before creating just 3 columns
+    df.to_csv('my_data_raw.csv', index=False)
 
     # Concatenate column names and text into a single column, excluding column "main_datails" , can also put a list of columns
-    df['concatenated_text'] = df.apply(lambda row: '<br><br>'.join([f"{col}: {str(row[col])}" for col in df.columns if col != 'main_details']), axis=1)
+    df['concatenated_text'] = df.apply(lambda row: '<br><br>'.join([f"{col}: {str(row[col])}" for col in df.columns if col != 'MAIN_DETAILS']), axis=1)
     #create df with 2 columns
-    df = pd.DataFrame({"concatenated_text": df["concatenated_text"], "main_details": df["main_details"]})
+    df = pd.DataFrame({"concatenated_text": df["concatenated_text"], "MAIN_DETAILS": df["MAIN_DETAILS"]})
 
+    #save  df localy w/ 2 columns
+    df.to_csv('my_data_sorted.csv', index=False)
     return df
 
 
@@ -75,19 +80,19 @@ def create_html_file(df):
     
     # Add CSS styling to adjust column width and prevent overlapping
     html_table = html_table.replace('<table', '<table style="table-layout:fixed;width:100%;"')
+    html_table = html_table.replace('<th></th>', '<th style="width:10px;"></th>')
     html_table = html_table.replace('<th>concatenated_text</th>', '<th style="width:30%;">concatenated_text</th>')
-    html_table = html_table.replace('<th>main_details</th>', '<th style="width:70%;">main_details</th>')
     html_table = html_table.replace('<td>', '<td style="max-width:300px;word-wrap:break-word;">')
     html_table = html_table.replace('<a ', '<a style="word-wrap:break-word;" ')
-    with open("results.html", "w") as f:
+    with open("results2.html", "w") as f:
+        f.write(f'<style>table tr td:first-child {{width: 10px;}}</style>\n')
         f.write(html_table)
 
 
 def send_emails(df, email_to):
     # prep/save localy data
     create_html_file(df)
-    #save localy
-    df.to_csv('my_data.csv', index=False)
+    
 
 
     # Setup port number and server name
@@ -97,13 +102,14 @@ def send_emails(df, email_to):
     email_from = "njdevil707@gmail.com"
     pswd = localcred.email_pword
     # name the email subject
-    subject = "New email from with attachments!!"
+    subject = "Job Results Completed"
 
     for person in email_to:
 
         # Make the body of the email
         body = f"""
-        Results in .html
+        Results file in html (click and should open in seperate window). 
+        2 Additional raw .csv file were saved localy
         """
 
         # make a MIME object to define parts of the email
@@ -150,6 +156,8 @@ def send_emails(df, email_to):
     # Close the port
     TIE_server.quit()
 
+""" TESTING   """
+
 
 # for page_num in range(1, 15):
 #     print(25 * (page_num - 1))
@@ -163,6 +171,27 @@ def send_emails(df, email_to):
 #     #print(page)
 # for x in range(1, page+1):
 #     print(x)
+
+"""                            """
+# def highlight_keyword(s, keyword):
+#     s = str(s)
+#     if keyword in s:
+#         start_idx = s.find(keyword)
+#         end_idx = start_idx + len(keyword)
+#         highlighted = f'<span style="background-color: yellow">{keyword}</span>'
+#         return s[:start_idx] + highlighted + s[end_idx:]
+#     else:
+#         return s
+    
+# def highlight_keyword_italic_lightgreen(s, keyword):
+#     s = str(s)
+#     if keyword in s:
+#         start_idx = s.find(keyword)
+#         end_idx = start_idx + len(keyword)
+#         highlighted = f'<span style="background-color: #c8e6c9">{keyword}</span>'
+#         return s[:start_idx] + highlighted + s[end_idx:]
+#     else:
+#         return s
 
 
 
@@ -183,24 +212,21 @@ def send_emails(df, email_to):
     
 #     # Add CSS styling to adjust column width and prevent overlapping
 #     html_table = html_table.replace('<table', '<table style="table-layout:fixed;width:100%;"')
+#     html_table = html_table.replace('<th></th>', '<th style="width:10px;"></th>')
 #     html_table = html_table.replace('<th>concatenated_text</th>', '<th style="width:30%;">concatenated_text</th>')
-#     html_table = html_table.replace('<th>main_details</th>', '<th style="width:70%;">main_details</th>')
 #     html_table = html_table.replace('<td>', '<td style="max-width:300px;word-wrap:break-word;">')
 #     html_table = html_table.replace('<a ', '<a style="word-wrap:break-word;" ')
-
 #     with open("results2.html", "w") as f:
+#         f.write(f'<style>table tr td:first-child {{width: 10px;}}</style>\n')
 #         f.write(html_table)
 
 
-# df=pd.read_csv('my_data.csv')
 
-# # Concatenate column names and text into a single column, excluding column "main_datails" , can also put a list of columns
-# df['concatenated_text'] = df.apply(lambda row: '<br><br>'.join([f"{col}: {str(row[col])}" for col in df.columns if col != 'main_details']), axis=1)
+# # read CSV file and create HTML file
+# df=pd.read_csv('my_data_w-colm.csv')
+# create_html_file2(df)
 
 
-# # Print the updated DataFrame
-# # print(df["concatenated_text"],["main_details"])
-# df2 = pd.DataFrame({"concatenated_text": df["concatenated_text"], "main_details": df["main_details"]})
-# df2.to_csv('my_data2.csv', index=False)
-# print(df2)
-# create_html_file2(df2)
+# # Save the HTML to a file
+# with open("results2.html", "w") as f:
+#     f.write(df)
