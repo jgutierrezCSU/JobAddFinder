@@ -3,7 +3,7 @@
 Web scraper for LinkedIn using Python.
 
 Features: <br>
-Scrape Jobs using "Job title" , "City" , "State", "Country" and "distance" <br>
+Scrape Jobs using "Job title" , "City" , "State", "Country" and "distance" and optionally, "sort by"<br>
 Scripts prompts user if they want to manually login (preventing repetitive logins and avoiding detection) <br>
 After first log in cookies are saved and no logging in is necessary. <br>  
 Script sends an email with the following details after gathering info from site:<br>

@@ -17,6 +17,30 @@ import unicodedata
 #for installing packages on cmd : py -m pip install ...
 
 
+import requests
+import json
+
+def get_distance( main_location,given_location):
+    url = "https://maps.googleapis.com/maps/api/distancematrix/json?units=metric"
+    url += "&origins={}".format(given_location)
+    url += "&destinations={}".format(main_location)
+    url += "&mode=transit"
+    url += "&key={}".format(localcred.API_KEY)
+
+    response = requests.get(url)
+    response_json = json.loads(response.text)
+
+    if response_json["status"] == "OK":
+        distance = response_json["rows"][0]["elements"][0]["distance"]["text"]
+        duration = response_json["rows"][0]["elements"][0]["duration"]["text"]
+        return distance, duration
+    else:
+        print("Error: {}".format(response_json["status"]))
+        return None, None
+
+# Example usage
+
+
 def calculate_ranking(text):
     matches = re.findall(r"\d+", text)
 
@@ -28,7 +52,7 @@ def calculate_ranking(text):
         return 0.0
 
 
-def clean_data(df,user_choice):
+def clean_data(df,sortby_choice,given_location):
    
     columns = [
         "JOB_TITLE",
@@ -47,15 +71,30 @@ def clean_data(df,user_choice):
     df["RANKING"] = df["MATCHED_SKILLS"].apply(calculate_ranking)
     # Use insert() to move the 'RANKING' column to the second position
     df.insert(1, "RANKING", df.pop("RANKING"))
-    if user_choice is not None:
-        # "RANKING" column is now SORTED in descending order while keeping the "MAIN_LOCATION" column sorted in ascending order.
-        df = df.sort_values([user_choice], ascending=[False])
+   
+    # Create a new column called DISTANCE_TRAVELTIME
+    df['DISTANCE_TRAVELTIME'] = ""
 
-    #save raw df locally before creating just 3 columns
-    df.to_csv('my_data_raw.csv', index=False)
+    for index, row in df.iterrows():
+        main_location = row['MAIN_LOCATION']
+        distance, duration = get_distance(main_location, given_location)
+        print(distance,duration)
+        # print(f"Distance from {main_location} to {given_location} is {distance:.2f} km, travel time is {duration:.2f} minutes")
+        
+        # Insert the distance and travel time into the new column
+        df.at[index, 'DISTANCE_TRAVELTIME'] = f" {given_location.split(',')[0]}  ===> {main_location.split(',')[0]}is {distance}, Commute is {duration}"
+
+    
+    # Move the 'DISTANCE_TRAVELTIME' column to the 5th position
+    df.insert(4, 'DISTANCE_TRAVELTIME', df.pop('DISTANCE_TRAVELTIME'))
 
     # Concatenate column names and text into a single column, excluding column "main_datails" , can also put a list of columns
     df['SUM_DETAILS'] = df.apply(lambda row: '<br><br>'.join([f"{col}: {str(row[col])}" for col in df.columns if col != 'MAIN_DETAILS']), axis=1)
+
+    if sortby_choice is not None:
+            # By default: "RANKING" column is sorted in descending order
+            df = df.sort_values([sortby_choice], ascending=[False])
+        
 
     #create df with 2 columns
     df = pd.DataFrame({"SUM_DETAILS": df["SUM_DETAILS"], "MAIN_DETAILS": df["MAIN_DETAILS"]})
@@ -159,8 +198,40 @@ def send_emails(df, email_to):
     # Close the port
     TIE_server.quit()
 
-""" TESTING   """
+# """ TESTING   """
 
+# df=pd.read_csv('my_data_raw2.csv')
+# df=clean_data(df,None,"weinsberg,baden-Württemberg")
+# send_emails(df,["jesusg714@gmail.com"])
+
+
+#     # Implementation of the get_distance function here
+
+# # Sample data
+# data = {
+#     'ID': [1, 2, 3],
+#     'MAIN_LOCATION': ['New York, NY', 'San Francisco, CA', 'Los Angeles, CA']
+# }
+# df = pd.DataFrame(data)
+
+# # Given location
+# given_location = 'Chicago, IL'
+# api_key = 'YOUR_API_KEY' # Replace with your own API key
+
+# # Create a new column called DISTANCE_TRAVELTIME
+# df['DISTANCE_TRAVELTIME'] = ""
+
+# # Iterate through DataFrame and calculate distance
+# for index, row in df.iterrows():
+#     main_location = row['MAIN_LOCATION']
+#     distance, duration = get_distance(main_location, given_location)
+#     print(f"Distance from {main_location} to {given_location} is {distance} km, travel time is {duration} minutes")
+    
+#     # Insert the distance and travel time into the new column
+#     df.at[index, 'DISTANCE_TRAVELTIME'] = f"{distance} km, {duration} min"
+
+# # Print the updated DataFrame
+# print(df)
 
 # for page_num in range(1, 15):
 #     print(25 * (page_num - 1))

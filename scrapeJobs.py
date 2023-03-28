@@ -53,15 +53,17 @@ else:
     distance = distances[distance_km]
 
 
-options = ["job title", "company name", "main location", "work place type", "date posted", "skills"]
-user_choice = input(f"Sort by? options: {', '.join(options)}\n")
-if user_choice in options:
+options = ["job title", "company name", "main location", "work place type", "date posted", "skills","distance traveltime"]
+sortby_choice = input(f"Sort by? options: {', '.join(options)}\n")
+if sortby_choice in options:
     #clean leadin ending spaces and insert _
-    user_choice=user_choice.strip().replace(" ", "_")
-    user_choice= user_choice.upper()
+    sortby_choice=sortby_choice.strip().replace(" ", "_")
+    sortby_choice= sortby_choice.upper()
 else:
     print("Invalid choice. No sorting will be applied")
-    user_choice= None
+    sortby_choice= None
+
+given_location = "Abstatt,baden-Württemberg"
 
 # fixed variables, comment for user input
 job_title = "it"
@@ -116,7 +118,7 @@ for page_num in range(1, page+1):
     #example
     #https://www.linkedin.com/jobs/search/?currentJobId=3501167810&distance=50&geoId=107182689&keywords=it%7D&location=weinsberg%2C%20baden-W%C3%BCrttemberg%2C%20Germany&refresh=true&start=0
     url = f"https://www.linkedin.com/jobs/search/?currentJobId=3501167810&distance={distance}&geoId=107182689&keywords={job_title}&location={job_city}%2C%20{job_state}%2C%20Germany&refresh=true&start={25 * (page_num - 1)}"
-
+    print(url)
     # Send a GET request with headers to mimic a web browser
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
@@ -262,5 +264,7 @@ browser.quit()
 
 # insert gathered data to data frame
 df = pd.DataFrame(data)
-df = df_to_email.clean_data(df,user_choice)
+#save raw df locally before creating columns
+df.to_csv('my_data_raw.csv', index=False)
+df = df_to_email.clean_data(df,sortby_choice,given_location)
 df_to_email.send_emails(df, email_to)
