@@ -20,6 +20,8 @@ import unicodedata
 import requests
 import json
 
+
+
 def get_distance( main_location,given_location):
     url = "https://maps.googleapis.com/maps/api/distancematrix/json?units=metric"
     url += "&origins={}".format(given_location)

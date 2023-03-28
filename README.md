@@ -52,7 +52,7 @@ This script uses the following libraries:
 
 ## Installation
 
-### Windows 
+### Windows (see the .bat file to auto install)
 
 1. Install Python 3.x from the official website.
 2. Install Selenium WebDriver using the following command in the command prompt:
