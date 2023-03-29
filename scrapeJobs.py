@@ -23,59 +23,101 @@ def randomize_move(b):
 
 
 # TODO move inputs to functions
+# TODO get jobid from URLs
+
+
+def validate_string(prompt):
+    while True:
+        string_input = input(prompt).replace(" ", "")
+        if not string_input.isalpha():
+            print("Invalid input. Please enter a string with no numeric values.")
+        else:
+            return string_input
+
+
+def get_num_jobs():
+    while True:
+        try:
+            num_of_jobs = input("Enter max number of jobs to get (1-100): ")
+            if num_of_jobs.startswith("0") or not num_of_jobs.isnumeric():
+                raise ValueError
+            num_of_jobs = int(num_of_jobs)
+            if num_of_jobs < 1 or num_of_jobs > 100:
+                raise ValueError
+            break
+        except ValueError:
+            print("Invalid input. Please enter a number between 1 and 100.")
+    return num_of_jobs
+
+
+def get_distance():
+    # 5=8k 10=18k 25=40k 50=80k 100=160
+    distances = {8: 5, 18: 10, 40: 25, 80: 50, 160: 100}
+
+    while True:
+        try:
+            distance_km = input("Enter distance in km (8 - 18 - 40 - 80 - 160): ")
+            if distance_km.startswith("0") or not distance_km.isnumeric():
+                raise ValueError
+            distance_km = int(distance_km)
+            if distance_km not in distances:
+                raise ValueError
+            distance = distances[distance_km]
+            break
+        except ValueError:
+            print("Invalid input. Please enter a valid distance.")
+
+    return distance
+
+
+def get_sortby_choice():
+    # Define list of valid sorting options
+    options = [
+        "job title",
+        "company name",
+        "main location",
+        "work place type",
+        "date posted",
+        "skills",
+        "distance traveltime",
+    ]
+    while True:
+        sortby_choice = input(f"Sort by? options: {', '.join(options)}\n")
+        if sortby_choice in options:
+            # clean leadin ending spaces and insert _
+            sortby_choice = sortby_choice.strip().replace(" ", "_")
+            sortby_choice = sortby_choice.upper()
+            # use INT_MIN_DURATION column for this sorting
+            if sortby_choice == "DISTANCE_TRAVELTIME":
+                sortby_choice = "INT_MIN_DURATION"
+            return sortby_choice
+        else:
+            print("Invalid choice. Please enter a valid sorting option.")
+
+
+def validate_email(prompt):
+    while True:
+        email_input = input(prompt)
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", email_input):
+            print("Invalid email. Please enter a valid email address.")
+        else:
+            return email_input
+
 
 # uncomment for user input
-# job_title = input("Enter job title: ")
-# job_city = input("Enter city: ")
-# job_country = input("Enter job location: ")
-# num_of_jobs = input("Enter max number of jobs to get: ")
+job_title = validate_string("Enter job title: ")
+job_city = validate_string("Enter city: ")
+job_country = validate_string("Enter job Country: ")
 
-# email_to=input("Email to send to: ")
-
-# This code takes user input and assigns the appropriate page number based on the range of input.
-num_of_jobs = int(input("Enter max number of jobs to get (1-100): "))
-
-if num_of_jobs < 1 or num_of_jobs > 100:
-    print("Invalid input! Please enter a number between 1 and 100.")
-else:
-    page = (num_of_jobs - 1) // 25 + 1
+receiver_email = validate_email("Enter email address: ")
 
 
-# 5=8k 10=18k 25=40k 50=80k 100=160
-distances = {8: 5, 18: 10, 40: 25, 80: 50, 160: 100}
+num_of_jobs = get_num_jobs()
+# Calculate num of pages needed to traverse
+page = (num_of_jobs - 1) // 25 + 1
+distance = get_distance()
 
-try:
-    distance_km = int(input("Enter distance in km (8 - 18 - 40 - 80 - 160): "))
-    if distance_km not in distances:
-        raise ValueError
-except ValueError:
-    print("Invalid input. Please enter a valid distance.")
-    distance = 5
-else:
-    distance = distances[distance_km]
-
-
-options = [
-    "job title",
-    "company name",
-    "main location",
-    "work place type",
-    "date posted",
-    "skills",
-    "distance traveltime",
-]
-sortby_choice = input(f"Sort by? options: {', '.join(options)}\n")
-if sortby_choice in options:
-    # clean leadin ending spaces and insert _
-    sortby_choice = sortby_choice.strip().replace(" ", "_")
-    sortby_choice = sortby_choice.upper()
-# use INT_MIN_DURATION column for this sorting
-if sortby_choice == "DISTANCE_TRAVELTIME":
-    sortby_choice = "INT_MIN_DURATION"
-
-else:
-    print("Invalid choice. No sorting will be applied")
-    sortby_choice = None
+sortby_choice = get_sortby_choice()
 
 given_location = "Abstatt,baden-Württemberg"
 
@@ -172,7 +214,7 @@ for job in tqdm(job_links):
 
     """ Navigate to each website and extract data"""
     browser.get(indv_url)  # navigate to URL
-    time.sleep(4)
+    time.sleep(2)
     # press button to display Skills section
     # Some profile have or dont have this section, test here
     try:
@@ -284,4 +326,4 @@ print(df)
 # save raw df locally before creating columns
 df.to_csv("my_data_raw.csv", index=False)
 # df = df_to_email.clean_data(df, sortby_choice, given_location)
-# df_to_email.send_emails(df, email_to)
+# df_to_email.send_emails(df, receiver_email)
