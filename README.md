@@ -14,6 +14,7 @@ Scraping details include: <br>
 Position title <br>
 Company name <br>
 Main Location <br>
+Comute time (user gives origin) <br>
 Place of work (could be multiple or remote) <br>
 Date posted <br>
 Skills needed (if available) <br>
@@ -28,7 +29,7 @@ then script will use login details from a localcred.py file to login <br>
 After running script the first time user should choose no for the log in options, <br>
 doing this will load cookies from previous ranned script and load them to browser. <br>
 <br>
-Distance" input: allows the user to input a distance in kilometers,the code sets the distance to a default value of 8 km radius<br>
+Distance" input: allows the user to input a distance in kilometers,if none,the code sets the distance to a default value of 8 km radius<br>
 <br>
 Script prompts the user to enter a sort by category, and then sorts the end result based on the user's input<br>
 <br>
@@ -52,7 +53,7 @@ This script uses the following libraries:
 
 ## Installation
 
-### Windows (see the .bat file to auto install)
+### Windows (see the install_dependencies.bat file to auto install)
 
 1. Install Python 3.x from the official website.
 2. Install Selenium WebDriver using the following command in the command prompt:

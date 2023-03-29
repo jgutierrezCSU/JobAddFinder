@@ -17,5 +17,6 @@ echo Installing selenium...
 py -m pip install selenium
 echo Installing df_to_email...
 py -m pip install df_to_email
+
 echo Dependencies installed successfully!
 pause

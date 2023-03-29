@@ -74,6 +74,7 @@ def clean_data(df,sortby_choice,given_location):
     # Use insert() to move the 'RANKING' column to the second position
     df.insert(1, "RANKING", df.pop("RANKING"))
    
+   #TODO get and make distance to int
     # Create a new column called DISTANCE_TRAVELTIME
     df['DISTANCE_TRAVELTIME'] = ""
 
