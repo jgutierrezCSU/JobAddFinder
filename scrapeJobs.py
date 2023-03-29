@@ -22,6 +22,8 @@ def randomize_move(b):
     b.execute_script("window.scrollTo(10, 900)")
 
 
+# TODO move inputs to functions
+
 # uncomment for user input
 # job_title = input("Enter job title: ")
 # job_city = input("Enter city: ")
@@ -30,7 +32,7 @@ def randomize_move(b):
 
 # email_to=input("Email to send to: ")
 
-# This code takes user input and assigns the appropriate page number based on the range of input. 
+# This code takes user input and assigns the appropriate page number based on the range of input.
 num_of_jobs = int(input("Enter max number of jobs to get (1-100): "))
 
 if num_of_jobs < 1 or num_of_jobs > 100:
@@ -53,15 +55,27 @@ else:
     distance = distances[distance_km]
 
 
-options = ["job title", "company name", "main location", "work place type", "date posted", "skills","distance traveltime"]
+options = [
+    "job title",
+    "company name",
+    "main location",
+    "work place type",
+    "date posted",
+    "skills",
+    "distance traveltime",
+]
 sortby_choice = input(f"Sort by? options: {', '.join(options)}\n")
 if sortby_choice in options:
-    #clean leadin ending spaces and insert _
-    sortby_choice=sortby_choice.strip().replace(" ", "_")
-    sortby_choice= sortby_choice.upper()
+    # clean leadin ending spaces and insert _
+    sortby_choice = sortby_choice.strip().replace(" ", "_")
+    sortby_choice = sortby_choice.upper()
+# use INT_MIN_DURATION column for this sorting
+if sortby_choice == "DISTANCE_TRAVELTIME":
+    sortby_choice = "INT_MIN_DURATION"
+
 else:
     print("Invalid choice. No sorting will be applied")
-    sortby_choice= None
+    sortby_choice = None
 
 given_location = "Abstatt,baden-Württemberg"
 
@@ -70,7 +84,7 @@ job_title = "it"
 job_city = "Weinsberg"
 job_country = "Germany"
 job_state = "baden-Württemberg"
-#num_of_jobs = 30
+# num_of_jobs = 30
 email_to = ["jesusg714@gmail.com"]  # can send to multiple emails
 
 
@@ -109,14 +123,13 @@ time.sleep(2)
 
 # search all pages
 job_links = []
-
-for page_num in range(1, page+1):
-    #print("page_num :",page_num)
+for page_num in range(1, page + 1):
+    # print("page_num :",page_num)
     randomize_move(browser)
     time.sleep(3)
     # Construct the URL based on user inputs
-    #example
-    #https://www.linkedin.com/jobs/search/?currentJobId=3501167810&distance=50&geoId=107182689&keywords=it%7D&location=weinsberg%2C%20baden-W%C3%BCrttemberg%2C%20Germany&refresh=true&start=0
+    # example
+    # https://www.linkedin.com/jobs/search/?currentJobId=3501167810&distance=50&geoId=107182689&keywords=it%7D&location=weinsberg%2C%20baden-W%C3%BCrttemberg%2C%20Germany&refresh=true&start=0
     url = f"https://www.linkedin.com/jobs/search/?currentJobId=3501167810&distance={distance}&geoId=107182689&keywords={job_title}&location={job_city}%2C%20{job_state}%2C%20Germany&refresh=true&start={25 * (page_num - 1)}"
     print(url)
     # Send a GET request with headers to mimic a web browser
@@ -136,8 +149,11 @@ for page_num in range(1, page+1):
         )
     )
 
-print("job_links ",len(job_links))
-time.sleep(4.5)
+
+# get number of items request (shorten list if necessary)
+job_links = job_links[:num_of_jobs]
+
+time.sleep(2.5)
 randomize_move(browser)
 
 """ Now that we have all links from first page,
@@ -146,8 +162,8 @@ randomize_move(browser)
 tmp = 0
 data = []
 for job in tqdm(job_links):
-# for job in tqdm(job_links):
-    #print(",,,,,",tmp)
+    # for job in tqdm(job_links):
+    # print(",,,,,",tmp)
     randomize_move(browser)
     # tuple contains individual info for each job post
     data_tup = ()
@@ -170,7 +186,7 @@ for job in tqdm(job_links):
             By.XPATH,
             "//button[@class='jobs-unified-top-card__job-insight-text-button']",
         ).click()
-        time.sleep(3)
+        time.sleep(2)
     except:
         pass
 
@@ -253,7 +269,7 @@ for job in tqdm(job_links):
 
     time.sleep(2)
     tmp += 1
-    
+
     if tmp == num_of_jobs:
         break
 
@@ -264,7 +280,8 @@ browser.quit()
 
 # insert gathered data to data frame
 df = pd.DataFrame(data)
-#save raw df locally before creating columns
-df.to_csv('my_data_raw.csv', index=False)
-df = df_to_email.clean_data(df,sortby_choice,given_location)
-df_to_email.send_emails(df, email_to)
+print(df)
+# save raw df locally before creating columns
+df.to_csv("my_data_raw.csv", index=False)
+# df = df_to_email.clean_data(df, sortby_choice, given_location)
+# df_to_email.send_emails(df, email_to)

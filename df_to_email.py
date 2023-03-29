@@ -14,15 +14,41 @@ from tqdm import tqdm
 from time import sleep
 import unicodedata
 
-#for installing packages on cmd : py -m pip install ...
+# for installing packages on cmd : py -m pip install ...
 
 
 import requests
 import json
 
 
+def convert_to_numbs(str1, str2):
+    # Remove all non-numeric and non-decimal point characters from str1 and convert it to a float
+    num1 = float("".join(filter(lambda x: x.isdigit() or x == ".", str1)))
 
-def get_distance( main_location,given_location):
+    # Split the time string into a list of words
+    words = str2.split()
+    # Check if "mins" is less than 10, and convert the "hour" and "mins" strings to integers
+    if len(words) == 4:
+        if int(words[2]) < 10:
+            hours = int(words[0])
+            minutes = int(words[2])
+            total_minutes = hours * 100 + int("%02d" % minutes)
+
+        # if mins not less than 10
+        else:
+            total_minutes = int(words[0]) * 100 + int(words[2])
+
+    # under an hour
+    if len(words) == 2:
+        total_minutes = int(words[0])
+
+    return (num1, total_minutes)
+
+
+# print(convert_to_numbs("65 km", "15 mins"))
+
+
+def get_distance(main_location, given_location):
     url = "https://maps.googleapis.com/maps/api/distancematrix/json?units=metric"
     url += "&origins={}".format(given_location)
     url += "&destinations={}".format(main_location)
@@ -40,6 +66,7 @@ def get_distance( main_location,given_location):
         print("Error: {}".format(response_json["status"]))
         return None, None
 
+
 # Example usage
 
 
@@ -54,8 +81,8 @@ def calculate_ranking(text):
         return 0.0
 
 
-def clean_data(df,sortby_choice,given_location):
-   
+def clean_data(df, sortby_choice, given_location):
+
     columns = [
         "JOB_TITLE",
         "COMPANY_NAME",
@@ -73,37 +100,50 @@ def clean_data(df,sortby_choice,given_location):
     df["RANKING"] = df["MATCHED_SKILLS"].apply(calculate_ranking)
     # Use insert() to move the 'RANKING' column to the second position
     df.insert(1, "RANKING", df.pop("RANKING"))
-   
-   #TODO get and make distance to int
+
     # Create a new column called DISTANCE_TRAVELTIME
-    df['DISTANCE_TRAVELTIME'] = ""
-
+    df["DISTANCE_TRAVELTIME"] = ""
+    df["INT_MIN_DURATION"] = ""
+    # Create new Columns
     for index, row in df.iterrows():
-        main_location = row['MAIN_LOCATION']
+        main_location = row["MAIN_LOCATION"]
         distance, duration = get_distance(main_location, given_location)
-        print(distance,duration)
-        # print(f"Distance from {main_location} to {given_location} is {distance:.2f} km, travel time is {duration:.2f} minutes")
-        
+
         # Insert the distance and travel time into the new column
-        df.at[index, 'DISTANCE_TRAVELTIME'] = f" {given_location.split(',')[0]}  ===> {main_location.split(',')[0]}is {distance}, Commute is {duration}"
+        df.at[
+            index, "DISTANCE_TRAVELTIME"
+        ] = f" {given_location.split(',')[0]}  ===> {main_location.split(',')[0]} is {distance}, Commute is {duration}"
 
-    
+        # Get distance and duration in mins for sorting
+        dist_km, dist_mins = convert_to_numbs(distance, duration)
+        # Insert duration in mins to last column
+        df.at[index, "INT_MIN_DURATION"] = dist_mins
+
     # Move the 'DISTANCE_TRAVELTIME' column to the 5th position
-    df.insert(4, 'DISTANCE_TRAVELTIME', df.pop('DISTANCE_TRAVELTIME'))
-
-    # Concatenate column names and text into a single column, excluding column "main_datails" , can also put a list of columns
-    df['SUM_DETAILS'] = df.apply(lambda row: '<br><br>'.join([f"{col}: {str(row[col])}" for col in df.columns if col != 'MAIN_DETAILS']), axis=1)
+    df.insert(4, "DISTANCE_TRAVELTIME", df.pop("DISTANCE_TRAVELTIME"))
 
     if sortby_choice is not None:
-            # By default: "RANKING" column is sorted in descending order
+        # Sort by given choice
+        if sortby_choice == "INT_MIN_DURATION":
+            df = df.sort_values([sortby_choice], ascending=[True])
+        else:
             df = df.sort_values([sortby_choice], ascending=[False])
-        
 
-    #create df with 2 columns
-    df = pd.DataFrame({"SUM_DETAILS": df["SUM_DETAILS"], "MAIN_DETAILS": df["MAIN_DETAILS"]})
+    # Concatenate column names and text into a single column, excluding column "main_datails" , can also put a list of columns
+    df["SUM_DETAILS"] = df.apply(
+        lambda row: "<br><br>".join(  # TODO add and col !== "INT_MIN_DURATION"
+            [f"{col}: {str(row[col])}" for col in df.columns if col != "MAIN_DETAILS"]
+        ),
+        axis=1,
+    )
 
-    #save  df localy w/ 2 columns
-    df.to_csv('my_data_sorted.csv', index=False)
+    # create df with 2 columns
+    df = pd.DataFrame(
+        {"SUM_DETAILS": df["SUM_DETAILS"], "MAIN_DETAILS": df["MAIN_DETAILS"]}
+    )
+
+    # save  df localy w/ 2 columns
+    df.to_csv("my_data_sorted.csv", index=False)
     return df
 
 
@@ -119,27 +159,30 @@ def create_html_file(df):
     )
     # save locally
     html_table = df.to_html(
-        render_links=True, 
-        justify="justify-all", 
-        escape=False, 
-        classes="break-word"
+        render_links=True, justify="justify-all", escape=False, classes="break-word"
     )
-    
+
     # Add CSS styling to adjust column width and prevent overlapping
-    html_table = html_table.replace('<table', '<table style="table-layout:fixed;width:100%;"')
-    html_table = html_table.replace('<th></th>', '<th style="width:22px;"></th>')
-    html_table = html_table.replace('<th>SUM_DETAILS</th>', '<th style="width:30%;">SUM_DETAILS</th>')
-    html_table = html_table.replace('<td>', '<td style="max-width:300px;word-wrap:break-word;">')
-    html_table = html_table.replace('<a ', '<a style="word-wrap:break-word;" ')
+    html_table = html_table.replace(
+        "<table", '<table style="table-layout:fixed;width:100%;"'
+    )
+    html_table = html_table.replace("<th></th>", '<th style="width:22px;"></th>')
+    html_table = html_table.replace(
+        "<th>SUM_DETAILS</th>", '<th style="width:30%;">SUM_DETAILS</th>'
+    )
+    html_table = html_table.replace(
+        "<td>", '<td style="max-width:300px;word-wrap:break-word;">'
+    )
+    html_table = html_table.replace("<a ", '<a style="word-wrap:break-word;" ')
     with open("results.html", "w") as f:
-        f.write(f'<style>table tr td:first-child {{width: 10px;}}</style>\n')
+        f.write(f"<style>table tr td:first-child {{width: 10px;}}</style>\n")
         f.write(html_table)
 
 
 def send_emails(df, email_to):
     # prep/save localy data
     create_html_file(df)
-    
+
     # Setup port number and server name
     smtp_port = 587  # Standard secure SMTP port
     smtp_server = "smtp.gmail.com"  # Google SMTP Server
@@ -201,11 +244,12 @@ def send_emails(df, email_to):
     # Close the port
     TIE_server.quit()
 
+
 # """ TESTING   """
 
-# df=pd.read_csv('my_data_raw2.csv')
-# df=clean_data(df,None,"weinsberg,baden-Württemberg")
-# send_emails(df,["jesusg714@gmail.com"])
+# df = pd.read_csv("my_data_raw.csv")
+# df = clean_data(df, None, "weinsberg,baden-Württemberg")
+# send_emails(df, ["jesusg714@gmail.com"])
 
 
 #     # Implementation of the get_distance function here
@@ -229,7 +273,7 @@ def send_emails(df, email_to):
 #     main_location = row['MAIN_LOCATION']
 #     distance, duration = get_distance(main_location, given_location)
 #     print(f"Distance from {main_location} to {given_location} is {distance} km, travel time is {duration} minutes")
-    
+
 #     # Insert the distance and travel time into the new column
 #     df.at[index, 'DISTANCE_TRAVELTIME'] = f"{distance} km, {duration} min"
 
@@ -259,7 +303,7 @@ def send_emails(df, email_to):
 #         return s[:start_idx] + highlighted + s[end_idx:]
 #     else:
 #         return s
-    
+
 # def highlight_keyword_italic_lightgreen(s, keyword):
 #     s = str(s)
 #     if keyword in s:
@@ -271,7 +315,6 @@ def send_emails(df, email_to):
 #         return s
 
 
-
 # def create_html_file2(df):
 #     # encode for email
 #     df = df.applymap(
@@ -281,12 +324,12 @@ def send_emails(df, email_to):
 #     )
 #     # save locally
 #     html_table = df.to_html(
-#         render_links=True, 
-#         justify="justify-all", 
-#         escape=False, 
+#         render_links=True,
+#         justify="justify-all",
+#         escape=False,
 #         classes="break-word"
 #     )
-    
+
 #     # Add CSS styling to adjust column width and prevent overlapping
 #     html_table = html_table.replace('<table', '<table style="table-layout:fixed;width:100%;"')
 #     html_table = html_table.replace('<th></th>', '<th style="width:20px;"></th>')
@@ -296,7 +339,6 @@ def send_emails(df, email_to):
 #     with open("results2.html", "w") as f:
 #         f.write(f'<style>table tr td:first-child {{width: 10px;}}</style>\n')
 #         f.write(html_table)
-
 
 
 # # read CSV file and create HTML file
@@ -322,7 +364,7 @@ def send_emails(df, email_to):
 
 
 # for _ in range(20):
-#     # This code takes user input and assigns the appropriate page number based on the range of input. 
+#     # This code takes user input and assigns the appropriate page number based on the range of input.
 #     num_of_jobs = int(input("Enter max number of jobs to get (1-100): "))
 
 #     if num_of_jobs < 1 or num_of_jobs > 100:
