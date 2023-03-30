@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/jgutierrezCSU/WebScrapperPython.svg?branch=master)](https://travis-ci.org/jgutierrezCSU/WebScrapperPython)
+[![Build Status](https://app.travis-ci.com/jgutierrezCSU/WebScrapperPython.svg?branch=master)](https://app.travis-ci.com/jgutierrezCSU/WebScrapperPython)
 
 Web scraper for LinkedIn using Python.
 

@@ -46,13 +46,13 @@ def convert_to_numbs(str1, str2):
 
 
 # print(convert_to_numbs("65 km", "15 mins"))
-
-
+#Docs https://developers.google.com/maps/documentation/javascript/distancematrix#transit_options
+#mode options: BICYCLING ,DRIVING ,TRANSIT (public transit routes.),WALKING
 def get_distance(job_main_location, given_origin):
     url = "https://maps.googleapis.com/maps/api/distancematrix/json?units=metric"
     url += "&origins={}".format(given_origin)
     url += "&destinations={}".format(job_main_location)
-    url += "&mode=transit"
+    url += "&mode=DRIVING"
     url += "&key={}".format(localcred.API_KEY)
 
     response = requests.get(url)
@@ -112,7 +112,7 @@ def clean_data(df, sortby_choice, given_origin):
         # Insert the distance and travel time into the new column
         df.at[
             index, "DISTANCE_TRAVELTIME"
-        ] = f" {given_origin.split(',')[0]}  ===> {main_location.split(',')[0]} is {distance}, Commute is {duration}"
+        ] = f" {given_origin.split(',')[0]}  ===> {job_main_location.split(',')[0]} is {distance}, Commute is {duration}"
 
         # Get distance and duration in mins for sorting
         dist_km, dist_mins = convert_to_numbs(distance, duration)
@@ -192,54 +192,54 @@ def send_emails(df, email_to):
     # name the email subject
     subject = "Job Results Completed"
 
-    for person in email_to:
+    
 
-        # Make the body of the email
-        body = f"""
-        Results file in html (click to open in seperate window). 
-        2 Additional raw .csv file were saved locally
-        """
+    # Make the body of the email
+    body = f"""
+    Results file in html (click to open in seperate window). 
+    2 Additional raw .csv file were saved locally
+    """
 
-        # make a MIME object to define parts of the email
-        msg = MIMEMultipart()
-        msg["From"] = email_from
-        msg["To"] = person
-        msg["Subject"] = subject
+    # make a MIME object to define parts of the email
+    msg = MIMEMultipart()
+    msg["From"] = email_from
+    msg["To"] = email_to
+    msg["Subject"] = subject
 
-        # Attach the body of the message
-        msg.attach(MIMEText(body, "plain"))
+    # Attach the body of the message
+    msg.attach(MIMEText(body, "plain"))
 
-        # Define the file to attach,
-        # created from create_html_file function
-        filename = "results.html"
+    # Define the file to attach,
+    # created from create_html_file function
+    filename = "results.html"
 
-        # Open the file in python as a binary
-        attachment = open(filename, "rb")  # r for read and b for binary
+    # Open the file in python as a binary
+    attachment = open(filename, "rb")  # r for read and b for binary
 
-        # Encode as base 64
-        attachment_package = MIMEBase("application", "octet-stream")
-        attachment_package.set_payload((attachment).read())
-        encoders.encode_base64(attachment_package)
-        attachment_package.add_header(
-            "Content-Disposition", "attachment; filename= " + filename
-        )
-        msg.attach(attachment_package)
-        text = msg.as_string()
+    # Encode as base 64
+    attachment_package = MIMEBase("application", "octet-stream")
+    attachment_package.set_payload((attachment).read())
+    encoders.encode_base64(attachment_package)
+    attachment_package.add_header(
+        "Content-Disposition", "attachment; filename= " + filename
+    )
+    msg.attach(attachment_package)
+    text = msg.as_string()
 
-        # Connect with the server
-        print("Connecting to server...")
-        TIE_server = smtplib.SMTP(smtp_server, smtp_port)
-        TIE_server.starttls()
-        TIE_server.login(email_from, pswd)
-        print("Succesfully connected to server")
-        print()
+    # Connect with the server
+    print("Connecting to server...")
+    TIE_server = smtplib.SMTP(smtp_server, smtp_port)
+    TIE_server.starttls()
+    TIE_server.login(email_from, pswd)
+    print("Succesfully connected to server")
+    print()
 
-        # Send emails to "person" as list is iterated
-        print(f"Sending email to: {person}...")
-        TIE_server.sendmail(email_from, person, text)
-        # TIE_server.sendmail(email_from, person, text)
-        print(f"Email sent to: {person}")
-        print()
+    # Send emails to "person" as list is iterated
+    print(f"Sending email to: {email_to}...")
+    TIE_server.sendmail(email_from, email_to, text)
+    # TIE_server.sendmail(email_from, person, text)
+    print(f"Email sent to: {email_to}")
+    print()
 
     # Close the port
     TIE_server.quit()
