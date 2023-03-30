@@ -108,30 +108,28 @@ def validate_email(prompt):
 job_title = validate_string("Enter job title: ")
 job_city = validate_string("Enter city: ")
 job_country = validate_string("Enter job Country: ")
-
+job_state = validate_string("Enter job State: ")
 receiver_email = validate_email("Enter email address: ")
-
-
 num_of_jobs = get_num_jobs()
-# Calculate num of pages needed to traverse
-page = (num_of_jobs - 1) // 25 + 1
 distance = get_distance()
-
 sortby_choice = get_sortby_choice()
+logging_in = input("Log in ? y/n: ")
 
-given_location = "Abstatt,baden-Württemberg"
+given_origin = "Abstatt,baden-Württemberg"
 
 # fixed variables, comment for user input
-job_title = "it"
-job_city = "Weinsberg"
-job_country = "Germany"
-job_state = "baden-Württemberg"
-# num_of_jobs = 30
-email_to = ["jesusg714@gmail.com"]  # can send to multiple emails
+# job_title = "it"
+# job_city = "Weinsberg"
+# job_country = "Germany"
+# job_state = "baden-Württemberg"
+# # num_of_jobs = 30
+# email_to = ["jesusg714@gmail.com"]  # can send to multiple emails
 
 
 # So script wont always log user in and get detected, get cookies
-logging_in = input("Log in ? y/n: ")
+
+
+
 if logging_in == "y":
     browser = webdriver.Chrome()  # start a web browser
     """ Opening linkedIn's login page & Log in """
@@ -163,6 +161,8 @@ for cookie in cookies:
 browser.refresh()
 time.sleep(2)
 
+# Calculate num of pages needed to traverse
+page = (num_of_jobs - 1) // 25 + 1
 # search all pages
 job_links = []
 for page_num in range(1, page + 1):
@@ -325,5 +325,5 @@ df = pd.DataFrame(data)
 print(df)
 # save raw df locally before creating columns
 df.to_csv("my_data_raw.csv", index=False)
-# df = df_to_email.clean_data(df, sortby_choice, given_location)
+# df = df_to_email.clean_data(df, sortby_choice, given_origin)
 # df_to_email.send_emails(df, receiver_email)

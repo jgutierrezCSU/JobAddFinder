@@ -48,10 +48,10 @@ def convert_to_numbs(str1, str2):
 # print(convert_to_numbs("65 km", "15 mins"))
 
 
-def get_distance(main_location, given_location):
+def get_distance(job_main_location, given_origin):
     url = "https://maps.googleapis.com/maps/api/distancematrix/json?units=metric"
-    url += "&origins={}".format(given_location)
-    url += "&destinations={}".format(main_location)
+    url += "&origins={}".format(given_origin)
+    url += "&destinations={}".format(job_main_location)
     url += "&mode=transit"
     url += "&key={}".format(localcred.API_KEY)
 
@@ -81,7 +81,7 @@ def calculate_ranking(text):
         return 0.0
 
 
-def clean_data(df, sortby_choice, given_location):
+def clean_data(df, sortby_choice, given_origin):
 
     columns = [
         "JOB_TITLE",
@@ -106,13 +106,13 @@ def clean_data(df, sortby_choice, given_location):
     df["INT_MIN_DURATION"] = ""
     # Create new Columns
     for index, row in df.iterrows():
-        main_location = row["MAIN_LOCATION"]
-        distance, duration = get_distance(main_location, given_location)
+        job_main_location = row["MAIN_LOCATION"]
+        distance, duration = get_distance(job_main_location, given_origin)
 
         # Insert the distance and travel time into the new column
         df.at[
             index, "DISTANCE_TRAVELTIME"
-        ] = f" {given_location.split(',')[0]}  ===> {main_location.split(',')[0]} is {distance}, Commute is {duration}"
+        ] = f" {given_origin.split(',')[0]}  ===> {main_location.split(',')[0]} is {distance}, Commute is {duration}"
 
         # Get distance and duration in mins for sorting
         dist_km, dist_mins = convert_to_numbs(distance, duration)
@@ -262,7 +262,7 @@ def send_emails(df, email_to):
 # df = pd.DataFrame(data)
 
 # # Given location
-# given_location = 'Chicago, IL'
+# given_origin = 'Chicago, IL'
 # api_key = 'YOUR_API_KEY' # Replace with your own API key
 
 # # Create a new column called DISTANCE_TRAVELTIME
@@ -270,9 +270,9 @@ def send_emails(df, email_to):
 
 # # Iterate through DataFrame and calculate distance
 # for index, row in df.iterrows():
-#     main_location = row['MAIN_LOCATION']
-#     distance, duration = get_distance(main_location, given_location)
-#     print(f"Distance from {main_location} to {given_location} is {distance} km, travel time is {duration} minutes")
+#     job_main_location = row['MAIN_LOCATION']
+#     distance, duration = get_distance(job_main_location, given_origin)
+#     print(f"Distance from {job_main_location} to {given_origin} is {distance} km, travel time is {duration} minutes")
 
 #     # Insert the distance and travel time into the new column
 #     df.at[index, 'DISTANCE_TRAVELTIME'] = f"{distance} km, {duration} min"
