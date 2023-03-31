@@ -184,12 +184,12 @@ if logging_in == "y":
 
     # find username field and enter credentials
     username = wait.until(EC.visibility_of_element_located((By.NAME, "session_key")))
-    username.send_keys(localcred.u_cred)
+    username.send_keys(localcred.linkedin_uname)
     time.sleep(3)
 
     # find password field and enter credentials
     pword = browser.find_element(By.ID, "password")
-    pword.send_keys(localcred.p_cred)
+    pword.send_keys(localcred.linkedin_pword)
     time.sleep(3)
 
     # click the login button
