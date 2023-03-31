@@ -28,8 +28,8 @@ def randomize_move(b):
 
 # TODO move inputs to functions
 # TODO get jobid from URLs
-#TODO check if cookie not expired before running script ( check if logged in)
 # TODO check for duplicate posting when traversing pages
+#TODO add job level detail
 
 
 def validate_string(prompt):
@@ -127,12 +127,12 @@ job_title = "it"
 job_city = "Weinsberg"
 job_country = "Germany"
 job_state = "baden-Württemberg"
-num_of_jobs =3
-sortby_choice="SKILLS"
+num_of_jobs =95
+sortby_choice="INT_MIN_DURATION"
 distance=25
 email_to = "jesusg714@gmail.com"  # can send to multiple emails
 logging_in = "n"
-given_origin = "Abstatt,baden-Württemberg"
+given_origin = "Weinsberg,baden-Württemberg"
 
 
 
@@ -154,10 +154,10 @@ if logging_in == "y":
     # submit entries
     pword = browser.find_element(By.ID, "password")
     pword.send_keys(localcred.p_cred)
-    time.sleep(5)
+    time.sleep(3)
     # click the button
     button = browser.find_element(By.XPATH, "//button[text()='Sign in']").click()
-    time.sleep(5)
+    time.sleep(3)
     # steps to login
     pickle.dump(browser.get_cookies(), open("cookies.pkl", "wb"))
     browser.close()
@@ -178,14 +178,12 @@ with webdriver.Chrome() as browser:
     time.sleep(2)
 
     #go to jobs page
-    first_url = f"https://www.linkedin.com/jobs/search/?currentJobId=3501167810&distance={distance}&geoId=107182689&keywords={job_title}&location={job_city}%2C%20{job_state}%2C%20Germany&refresh=true"
-    url_to_travers=[]
-    url_to_travers.append(first_url)
+    url = f"https://www.linkedin.com/jobs/search/?currentJobId=3501167810&distance={distance}&geoId=107182689&keywords={job_title}&location={job_city}%2C%20{job_state}%2C%20Germany&refresh=true"
     print("outside")
     for page_num in range(1, page + 1):
 
         print(page_num,page+1)
-        browser.get(url_to_travers[page_num-1])
+        browser.get(url)
         # Get the page source using Selenium
         page_source = browser.page_source
         # Parse the page source with BeautifulSoup
@@ -208,34 +206,28 @@ with webdriver.Chrome() as browser:
 
         # find all elements with the class "full-width artdeco-entity-lockup__title ember-view"
         elements = soup.find_all("div", class_="full-width artdeco-entity-lockup__title ember-view")
-        # print(elements)
-        # print(len(elements))
         # Loop through each div element and extract the href attribute of the first <a> tag
         for div in elements:
             href = div.find('a').get('href')
             # Convert relative links to absolute links
-            absolute_href = urljoin(first_url, href)
+            absolute_href = urljoin(url, href)
             # Add absolute link to job_links list
             job_links.append(absolute_href)
-            
-        # Print the list of job links
-        # print(job_links)
+
         print(len(job_links))
 
         # find the button using its CSS selector
-        print(page_num)
         button = browser.find_element(By.CSS_SELECTOR, f'button[aria-label="Page {str(page_num+1)}"]')
         # click the button
         button.click()
-        time.sleep(3)
-        url_to_travers.append(browser.current_url)
-        print("end")
+        time.sleep(2)
+        url=browser.current_url
         
     # quit()
     # get number of items request (shorten list if necessary)
     job_links = job_links[:num_of_jobs]
     # print(job_links)
-    time.sleep(2.5)
+    time.sleep(2)
     randomize_move(browser)
 
     """ Now that we have all links from first page,
@@ -249,7 +241,6 @@ with webdriver.Chrome() as browser:
         data_tup = ()
         # get URL
         indv_url = job
-        print(indv_url)
         """ Navigate to each website and extract data"""
         browser.get(indv_url)  # navigate to URL
         time.sleep(2)
