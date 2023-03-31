@@ -20,12 +20,14 @@ import format_html_results
 
 
 def convert_to_numbs(str1, str2):
-    # Remove all non-numeric and non-decimal point characters from str1 and convert it to a float
+    # Remove all non-numeric and non-decimal point characters from str1
+    # and convert it to a float
     num1 = float("".join(filter(lambda x: x.isdigit() or x == ".", str1)))
 
     # Split the time string into a list of words
     words = str2.split()
-    # Check if "mins" is less than 10, and convert the "hour" and "mins" strings to integers
+    # Check if "mins" is less than 10, and convert the "hour" and "mins"
+    #  strings to integers
     if len(words) == 4:
         if int(words[2]) < 10:
             hours = int(words[0])
@@ -46,25 +48,39 @@ def convert_to_numbs(str1, str2):
 # Docs https://developers.google.com/maps/documentation/javascript/distancematrix#transit_options
 # mode options: BICYCLING ,DRIVING ,TRANSIT (public transit routes.),WALKING
 def get_distance(job_main_location, given_origin):
+
+    # Set up the URL for the Google Maps Distance Matrix API request
     url = "https://maps.googleapis.com/maps/api/distancematrix/json?units=metric"
     url += "&origins={}".format(given_origin)
     url += "&destinations={}".format(job_main_location)
     url += "&mode=DRIVING"
     url += "&key={}".format(localcred.API_KEY)
 
+    # Make the API request and parse the response
     response = requests.get(url)
     response_json = json.loads(response.text)
 
+    # Check if the response status is OK and extract the distance and duration if so
     if response_json["status"] == "OK":
         distance = response_json["rows"][0]["elements"][0]["distance"]["text"]
         duration = response_json["rows"][0]["elements"][0]["duration"]["text"]
         return distance, duration
     else:
+        # Print an error message and return None for distance and duration
         print("Error: {}".format(response_json["status"]))
         return None, None
 
 
 def calculate_ranking(text):
+
+    """
+    Calculate the RANKING rating from the given text.
+    Parameters:
+    text (str): The text containing the numerator and denominator.
+    Returns:
+    float: The RANKING rating calculated from the numerator and denominator in the text.
+    If the text does not contain both a numerator and a denominator, 0.0 is returned.
+    """
     matches = re.findall(r"\d+", text)
 
     if len(matches) == 2:
@@ -76,6 +92,30 @@ def calculate_ranking(text):
 
 
 def clean_data(df, sortby_choice, given_origin):
+    """
+    Cleans and sorts a given pandas dataframe containing job data.
+
+    Args:
+        df (pandas.DataFrame): The dataframe to be cleaned and sorted.
+        sortby_choice (str): The column name to sort the dataframe by.
+            Must be one of the column names in the dataframe.
+            If None, the dataframe will not be sorted.
+        given_origin (str): The origin location to calculate distance and travel time from.
+            Must be a string in the format of "city, state".
+
+    Returns:
+        pandas.DataFrame: The cleaned and sorted dataframe.
+            The dataframe will have a new "RANKING" column that is calculated based on
+            the "MATCHED_SKILLS" column.
+            The "DISTANCE_TRAVELTIME" column will also be created based on the
+            distance and travel time between the job location and the given origin.
+            The dataframe will be sorted by the "sortby_choice" column in ascending
+            or descending order, depending on the column type.
+            Finally, the dataframe will be saved to a CSV file named "my_data_sorted.csv".
+
+    Raises:
+        ValueError: If "sortby_choice" is not a column name in the dataframe.
+    """
 
     columns = [
         "JOB_TITLE",
@@ -139,10 +179,23 @@ def clean_data(df, sortby_choice, given_origin):
     return df
 
 
-""" send to email"""
-
-
 def send_emails(df, email_to):
+    """
+    Function send_emails:
+
+    Sends an email with an attachment to the specified recipient email address.
+    The function takes in a dataframe, df, containing job search results, and the recipient email address, email_to.
+    The job search results are formatted and saved locally as an HTML file using the create_html_file function from the format_html_results module.
+
+    Parameters:
+
+    df (pandas DataFrame): A dataframe containing job search results.
+    email_to (str): The email address of the recipient.
+    Returns:
+
+    None
+    """
+
     # prep/save localy data
     format_html_results.create_html_file(df)
 

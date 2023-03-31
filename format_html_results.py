@@ -3,7 +3,8 @@ import unicodedata
 
 # TODO make font TH bold ( via inspect page / computed)
 def create_html_file(df):
-    # encode for email
+
+    # Encode non-ASCII characters for email compatibility
     df = df.applymap(
         lambda x: unicodedata.normalize("NFKD", str(x))
         .encode("ascii", "ignore")
@@ -43,7 +44,7 @@ def create_html_file(df):
           </thead>
           <tbody>
     """
-
+    # Iterate through each row in the dataframe
     for index, row in df.iterrows():
         # Create a row for each record in the DataFrame
         html_table += f"""
