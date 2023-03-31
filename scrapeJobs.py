@@ -4,19 +4,26 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.expected_conditions import visibility_of_element_located
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
-
 import pandas as pd
 import re
 import requests
 from bs4 import BeautifulSoup
 import time
-import localcred
 import pickle
 from tqdm import tqdm
 from time import sleep
 from urllib.parse import urljoin
 import df_to_email
 import random
+
+import localcred
+
+""" 
+file needs : linkedin_uname ,linkedin_pword ,
+email_pword ()
+API_KEY ()
+
+"""
 
 
 def randomize_move(browser):
@@ -160,11 +167,11 @@ job_title = "it"
 job_city = "Weinsberg"
 job_country = "Germany"
 job_state = "baden-Württemberg"
-num_of_jobs = 6
+num_of_jobs = 2
 sortby_choice = "INT_MIN_DURATION"
 distance = 25
 email_to = "jesusg714@gmail.com"  # can send to multiple emails
-logging_in = "n"
+logging_in = "y"
 given_origin = "Weinsberg,baden-Württemberg"
 
 
@@ -213,10 +220,14 @@ job_links = []
 # Create a new instance of the Firefox driver
 with webdriver.Chrome() as browser:
     browser.get("https://www.linkedin.com")
-    cookies = pickle.load(open("cookies.pkl", "rb"))
-    for cookie in cookies:
-        browser.add_cookie(cookie)
-    browser.refresh()
+    try:
+        cookies = pickle.load(open("cookies.pkl", "rb"))
+        for cookie in cookies:
+            browser.add_cookie(cookie)
+        browser.refresh()
+    except FileNotFoundError:
+        print("No cookies found, run script with 'y' option in log in prompt ?")
+        quit()
     time.sleep(2)
 
     # go to jobs page
