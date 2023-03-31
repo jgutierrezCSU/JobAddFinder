@@ -4,7 +4,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.expected_conditions import visibility_of_element_located
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
-
 import pandas as pd
 import re
 import requests
@@ -17,6 +16,9 @@ from time import sleep
 from urllib.parse import urljoin
 import df_to_email
 import random
+
+import localcred
+
 
 
 def randomize_move(browser):
