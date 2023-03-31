@@ -9,16 +9,14 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email import encoders
-
-from tqdm import tqdm
 from time import sleep
 import unicodedata
-
-# for installing packages on cmd : py -m pip install ...
-
-
 import requests
 import json
+
+import format_html_results
+
+# for installing packages on cmd : py -m pip install ...
 
 
 def convert_to_numbs(str1, str2):
@@ -45,9 +43,8 @@ def convert_to_numbs(str1, str2):
     return (num1, total_minutes)
 
 
-# print(convert_to_numbs("65 km", "15 mins"))
-#Docs https://developers.google.com/maps/documentation/javascript/distancematrix#transit_options
-#mode options: BICYCLING ,DRIVING ,TRANSIT (public transit routes.),WALKING
+# Docs https://developers.google.com/maps/documentation/javascript/distancematrix#transit_options
+# mode options: BICYCLING ,DRIVING ,TRANSIT (public transit routes.),WALKING
 def get_distance(job_main_location, given_origin):
     url = "https://maps.googleapis.com/maps/api/distancematrix/json?units=metric"
     url += "&origins={}".format(given_origin)
@@ -65,9 +62,6 @@ def get_distance(job_main_location, given_origin):
     else:
         print("Error: {}".format(response_json["status"]))
         return None, None
-
-
-# Example usage
 
 
 def calculate_ranking(text):
@@ -131,17 +125,15 @@ def clean_data(df, sortby_choice, given_origin):
 
     # Concatenate column names and text into a single column, excluding column "main_datails" , can also put a list of columns
     df["SUM_DETAILS"] = df.apply(
-        lambda row: "<br><br>".join(  # TODO add and col !== "INT_MIN_DURATION"
+        lambda row: "<br><br>".join(
             [f"{col}: {str(row[col])}" for col in df.columns if col != "MAIN_DETAILS"]
         ),
         axis=1,
     )
-
     # create df with 2 columns
     df = pd.DataFrame(
         {"SUM_DETAILS": df["SUM_DETAILS"], "MAIN_DETAILS": df["MAIN_DETAILS"]}
     )
-
     # save  df localy w/ 2 columns
     df.to_csv("my_data_sorted.csv", index=False)
     return df
@@ -150,38 +142,9 @@ def clean_data(df, sortby_choice, given_origin):
 """ send to email"""
 
 
-def create_html_file(df):
-    # encode for email
-    df = df.applymap(
-        lambda x: unicodedata.normalize("NFKD", str(x))
-        .encode("ascii", "ignore")
-        .decode("utf-8")
-    )
-    # save locally
-    html_table = df.to_html(
-        render_links=True, justify="justify-all", escape=False, classes="break-word"
-    )
-
-    # Add CSS styling to adjust column width and prevent overlapping
-    html_table = html_table.replace(
-        "<table", '<table style="table-layout:fixed;width:100%;"'
-    )
-    html_table = html_table.replace("<th></th>", '<th style="width:22px;"></th>')
-    html_table = html_table.replace(
-        "<th>SUM_DETAILS</th>", '<th style="width:30%;">SUM_DETAILS</th>'
-    )
-    html_table = html_table.replace(
-        "<td>", '<td style="max-width:300px;word-wrap:break-word;">'
-    )
-    html_table = html_table.replace("<a ", '<a style="word-wrap:break-word;" ')
-    with open("results.html", "w") as f:
-        f.write(f"<style>table tr td:first-child {{width: 10px;}}</style>\n")
-        f.write(html_table)
-
-
 def send_emails(df, email_to):
     # prep/save localy data
-    create_html_file(df)
+    format_html_results.create_html_file(df)
 
     # Setup port number and server name
     smtp_port = 587  # Standard secure SMTP port
@@ -192,14 +155,14 @@ def send_emails(df, email_to):
     # name the email subject
     subject = "Job Results Completed"
 
-    
-
     # Make the body of the email
     body = f"""
-    Results file in html (click to open in seperate window). 
+    Download file then open to use the file properly
+    Opening by just clicking file will now allow you 
+    use the buttons.
+     
     2 Additional raw .csv file were saved locally
     """
-
     # make a MIME object to define parts of the email
     msg = MIMEMultipart()
     msg["From"] = email_from
@@ -237,82 +200,13 @@ def send_emails(df, email_to):
     # Send emails to "person" as list is iterated
     print(f"Sending email to: {email_to}...")
     TIE_server.sendmail(email_from, email_to, text)
-    # TIE_server.sendmail(email_from, person, text)
     print(f"Email sent to: {email_to}")
-    print()
 
     # Close the port
     TIE_server.quit()
 
 
 # """ TESTING   """
-
-# df = pd.read_csv("my_data_raw.csv")
-# df = clean_data(df, None, "weinsberg,baden-Württemberg")
-# send_emails(df, ["jesusg714@gmail.com"])
-
-
-#     # Implementation of the get_distance function here
-
-# # Sample data
-# data = {
-#     'ID': [1, 2, 3],
-#     'MAIN_LOCATION': ['New York, NY', 'San Francisco, CA', 'Los Angeles, CA']
-# }
-# df = pd.DataFrame(data)
-
-# # Given location
-# given_origin = 'Chicago, IL'
-# api_key = 'YOUR_API_KEY' # Replace with your own API key
-
-# # Create a new column called DISTANCE_TRAVELTIME
-# df['DISTANCE_TRAVELTIME'] = ""
-
-# # Iterate through DataFrame and calculate distance
-# for index, row in df.iterrows():
-#     job_main_location = row['MAIN_LOCATION']
-#     distance, duration = get_distance(job_main_location, given_origin)
-#     print(f"Distance from {job_main_location} to {given_origin} is {distance} km, travel time is {duration} minutes")
-
-#     # Insert the distance and travel time into the new column
-#     df.at[index, 'DISTANCE_TRAVELTIME'] = f"{distance} km, {duration} min"
-
-# # Print the updated DataFrame
-# print(df)
-
-# for page_num in range(1, 15):
-#     print(25 * (page_num - 1))
-
-# num_of_jobs = int(input("Enter max number of jobs to get (1-100): "))
-
-# if num_of_jobs < 1 or num_of_jobs > 100:
-#     print("Invalid input! Please enter a number between 1 and 100.")
-# else:
-#     page = (num_of_jobs - 1) // 25 + 1
-#     #print(page)
-# for x in range(1, page+1):
-#     print(x)
-
-"""                            """
-# def highlight_keyword(s, keyword):
-#     s = str(s)
-#     if keyword in s:
-#         start_idx = s.find(keyword)
-#         end_idx = start_idx + len(keyword)
-#         highlighted = f'<span style="background-color: yellow">{keyword}</span>'
-#         return s[:start_idx] + highlighted + s[end_idx:]
-#     else:
-#         return s
-
-# def highlight_keyword_italic_lightgreen(s, keyword):
-#     s = str(s)
-#     if keyword in s:
-#         start_idx = s.find(keyword)
-#         end_idx = start_idx + len(keyword)
-#         highlighted = f'<span style="background-color: #c8e6c9">{keyword}</span>'
-#         return s[:start_idx] + highlighted + s[end_idx:]
-#     else:
-#         return s
 
 
 # def create_html_file2(df):
@@ -324,53 +218,26 @@ def send_emails(df, email_to):
 #     )
 #     # save locally
 #     html_table = df.to_html(
-#         render_links=True,
-#         justify="justify-all",
-#         escape=False,
-#         classes="break-word"
+#         render_links=True, justify="justify-all", escape=False, classes="break-word"
 #     )
 
 #     # Add CSS styling to adjust column width and prevent overlapping
-#     html_table = html_table.replace('<table', '<table style="table-layout:fixed;width:100%;"')
-#     html_table = html_table.replace('<th></th>', '<th style="width:20px;"></th>')
-#     html_table = html_table.replace('<th>SUM_DETAILS</th>', '<th style="width:30%;">SUM_DETAILS</th>')
-#     html_table = html_table.replace('<td>', '<td style="max-width:300px;word-wrap:break-word;">')
-#     html_table = html_table.replace('<a ', '<a style="word-wrap:break-word;" ')
-#     with open("results2.html", "w") as f:
-#         f.write(f'<style>table tr td:first-child {{width: 10px;}}</style>\n')
+#     html_table = html_table.replace(
+#         "<table", '<table style="table-layout:fixed;width:100%;"'
+#     )
+#     html_table = html_table.replace("<th></th>", '<th style="width:22px;"></th>')
+#     html_table = html_table.replace(
+#         "<th>SUM_DETAILS</th>", '<th style="width:30%;">SUM_DETAILS</th>'
+#     )
+#     html_table = html_table.replace(
+#         "<td>", '<td style="max-width:300px;word-wrap:break-word;">'
+#     )
+#     html_table = html_table.replace("<a ", '<a style="word-wrap:break-word;" ')
+#     with open("results.html", "w") as f:
+#         f.write(f"<style>table tr td:first-child {{width: 10px;}}</style>\n")
 #         f.write(html_table)
 
 
-# # read CSV file and create HTML file
-# df=pd.read_csv('my_data_sorted.csv')
+# df = pd.read_csv("my_data_raw.csv")
+# df = clean_data(df, "INT_MIN_DURATION", "Weinsberg,baden-Württemberg")
 # create_html_file2(df)
-
-
-# # # Save the HTML to a file
-# # with open("results2.html", "w") as f:
-# #     f.write(df)
-
-
-# for i in tqdm(range(100)):
-#     sleep(0.02)
-
-# # Create a list with 10 variables
-# my_list = [1, 2, 3, "four", 5.5, "six", True, None, [7, 8, 9], {"ten": 10}]
-
-# # Loop through the list and print each variable
-# for var in tqdm(my_list):
-#     pass
-#     # print(var)
-
-
-# for _ in range(20):
-#     # This code takes user input and assigns the appropriate page number based on the range of input.
-#     num_of_jobs = int(input("Enter max number of jobs to get (1-100): "))
-
-#     if num_of_jobs < 1 or num_of_jobs > 100:
-#         print("Invalid input! Please enter a number between 1 and 100.")
-#     else:
-#         page = (num_of_jobs - 1) // 25 + 1
-
-
-#     print(page)

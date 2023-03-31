@@ -19,20 +19,30 @@ import df_to_email
 import random
 
 
-
-def randomize_move(b):
-    random_number = random.randint(800,1200)
+def randomize_move(browser):
+    """
+    Scroll the browser window to a random position between 800 and 1200 pixels.
+    """
+    random_number = random.randint(800, 1200)
     random_number = str(random_number)
-    b.execute_script(f"window.scrollTo(10, {random_number})")
+    browser.execute_script(f"window.scrollTo(10, {random_number})")
 
 
-# TODO move inputs to functions
-# TODO get jobid from URLs
-# TODO check for duplicate posting when traversing pages
-#TODO add job level detail
+# TODO: Get job ID from URLs.
+# TODO: Check for duplicate postings when traversing pages.
+# TODO: Add job level detail.
 
 
 def validate_string(prompt):
+    """
+    Prompt the user to input a string without any numeric values.
+
+    Parameters:
+    prompt (str): The prompt to display to the user.
+
+    Returns:
+    str: The validated string input by the user.
+    """
     while True:
         string_input = input(prompt).replace(" ", "")
         if not string_input.isalpha():
@@ -42,6 +52,12 @@ def validate_string(prompt):
 
 
 def get_num_jobs():
+    """
+    Prompt the user to input the maximum number of jobs to get (between 1 and 100).
+
+    Returns:
+    int: The validated number of jobs input by the user.
+    """
     while True:
         try:
             num_of_jobs = input("Enter max number of jobs to get (1-100): ")
@@ -57,7 +73,13 @@ def get_num_jobs():
 
 
 def get_distance():
-    # 5=8k 10=18k 25=40k 50=80k 100=160
+    """
+    Prompt the user to input the distance in km (8, 18, 40, 80, or 160).
+
+    Returns:
+    int: The distance in miles corresponding to the validated distance in km input by the user.
+    """
+    # Define dictionary of valid distance options and their corresponding values in miles.
     distances = {8: 5, 18: 10, 40: 25, 80: 50, 160: 100}
 
     while True:
@@ -77,6 +99,10 @@ def get_distance():
 
 
 def get_sortby_choice():
+    """
+    Prompts the user to select a sorting option from a predefined list.
+    Returns the selected sorting option after cleaning and formatting it.
+    """
     # Define list of valid sorting options
     options = [
         "job title",
@@ -90,10 +116,11 @@ def get_sortby_choice():
     while True:
         sortby_choice = input(f"Sort by? options: {', '.join(options)}\n")
         if sortby_choice in options:
-            # clean leadin ending spaces and insert _
+            # clean leading and ending spaces and insert an underscore instead of a space
             sortby_choice = sortby_choice.strip().replace(" ", "_")
+            # convert the sorting option to uppercase
             sortby_choice = sortby_choice.upper()
-            # use INT_MIN_DURATION column for this sorting
+            # use INT_MIN_DURATION column for this sorting option
             if sortby_choice == "DISTANCE_TRAVELTIME":
                 sortby_choice = "INT_MIN_DURATION"
             return sortby_choice
@@ -102,6 +129,10 @@ def get_sortby_choice():
 
 
 def validate_email(prompt):
+    """
+    Prompts the user to enter an email address and validates its format.
+    Returns the email address if it is valid.
+    """
     while True:
         email_input = input(prompt)
         if not re.match(r"[^@]+@[^@]+\.[^@]+", email_input):
@@ -118,56 +149,67 @@ def validate_email(prompt):
 # receiver_email = validate_email("Enter email address: ")
 # num_of_jobs = get_num_jobs()
 # distance = get_distance()
-#sortby_choice = get_sortby_choice()
+# sortby_choice = get_sortby_choice()
 # logging_in = input("Log in ? y/n: ")
+# if logging_in != "y":
+#     print("Not logging In")
 
 
-# fixed variables, comment for user input
+# fixed variables, for testing
 job_title = "it"
 job_city = "Weinsberg"
 job_country = "Germany"
 job_state = "baden-Württemberg"
-num_of_jobs =95
-sortby_choice="INT_MIN_DURATION"
-distance=25
+num_of_jobs = 6
+sortby_choice = "INT_MIN_DURATION"
+distance = 25
 email_to = "jesusg714@gmail.com"  # can send to multiple emails
 logging_in = "n"
 given_origin = "Weinsberg,baden-Württemberg"
 
 
-
 # So script wont always log user in and get detected, get cookies
 
 
-
 if logging_in == "y":
-    browser = webdriver.Chrome()  # start a web browser
+    # start a web browser
+    browser = webdriver.Chrome()
     """ Opening linkedIn's login page & Log in """
+    # opening LinkedIn's login page and logging in
     randomize_move(browser)
     browser.get("https://linkedin.com/uas/login")
+
     # waiting for the page to load
     wait = WebDriverWait(browser, 20)
+
+    # find username field and enter credentials
     username = wait.until(EC.visibility_of_element_located((By.NAME, "session_key")))
-    username = browser.find_element(By.ID, "username")
     username.send_keys(localcred.u_cred)
     time.sleep(3)
-    # submit entries
+
+    # find password field and enter credentials
     pword = browser.find_element(By.ID, "password")
     pword.send_keys(localcred.p_cred)
     time.sleep(3)
-    # click the button
+
+    # click the login button
     button = browser.find_element(By.XPATH, "//button[text()='Sign in']").click()
     time.sleep(3)
-    # steps to login
+
+    # save login session cookies
     pickle.dump(browser.get_cookies(), open("cookies.pkl", "wb"))
+
+    # close the browser
     browser.close()
-    """ Logged in Now """
+
+# indicate that the user is logged in
+""" Logged in Now """
+
 
 # Calculate num of pages needed to traverse
 page = (num_of_jobs - 1) // 25 + 1
-# search all pages
-job_links = []
 
+job_links = []
 # Create a new instance of the Firefox driver
 with webdriver.Chrome() as browser:
     browser.get("https://www.linkedin.com")
@@ -177,52 +219,51 @@ with webdriver.Chrome() as browser:
     browser.refresh()
     time.sleep(2)
 
-    #go to jobs page
+    # go to jobs page
     url = f"https://www.linkedin.com/jobs/search/?currentJobId=3501167810&distance={distance}&geoId=107182689&keywords={job_title}&location={job_city}%2C%20{job_state}%2C%20Germany&refresh=true"
-    print("outside")
     for page_num in range(1, page + 1):
-
-        print(page_num,page+1)
         browser.get(url)
         # Get the page source using Selenium
         page_source = browser.page_source
         # Parse the page source with BeautifulSoup
-        soup = BeautifulSoup(page_source, 'html.parser')
+        soup = BeautifulSoup(page_source, "html.parser")
         time.sleep(1)
         # Find the element with the class "jobs-search-results-list"
-        element = browser.find_element(By.CLASS_NAME, 'jobs-search-results-list')
+        element = browser.find_element(By.CLASS_NAME, "jobs-search-results-list")
 
         # Scroll the element down by the specified amount
-        for i in range(5): # Scroll down 10 times
-            browser.execute_script(f"arguments[0].scrollBy(0, {800});",element)
+        for i in range(5):  # Scroll down 10 times
+            browser.execute_script(f"arguments[0].scrollBy(0, {800});", element)
             time.sleep(2)
         time.sleep(4)
 
-        #now that its loaded, grab new loaded content source
+        # now that its loaded, grab new loaded content source
         page_source = browser.page_source
         # Parse the page source with BeautifulSoup
-        soup = BeautifulSoup(page_source, 'html.parser')
+        soup = BeautifulSoup(page_source, "html.parser")
         time.sleep(1)
 
         # find all elements with the class "full-width artdeco-entity-lockup__title ember-view"
-        elements = soup.find_all("div", class_="full-width artdeco-entity-lockup__title ember-view")
+        elements = soup.find_all(
+            "div", class_="full-width artdeco-entity-lockup__title ember-view"
+        )
         # Loop through each div element and extract the href attribute of the first <a> tag
         for div in elements:
-            href = div.find('a').get('href')
+            href = div.find("a").get("href")
             # Convert relative links to absolute links
             absolute_href = urljoin(url, href)
             # Add absolute link to job_links list
             job_links.append(absolute_href)
 
-        print(len(job_links))
-
         # find the button using its CSS selector
-        button = browser.find_element(By.CSS_SELECTOR, f'button[aria-label="Page {str(page_num+1)}"]')
+        button = browser.find_element(
+            By.CSS_SELECTOR, f'button[aria-label="Page {str(page_num+1)}"]'
+        )
         # click the button
         button.click()
         time.sleep(2)
-        url=browser.current_url
-        
+        url = browser.current_url
+
     # quit()
     # get number of items request (shorten list if necessary)
     job_links = job_links[:num_of_jobs]
@@ -304,7 +345,9 @@ with webdriver.Chrome() as browser:
         if ul is not None:
             # now that I have <li> with skills,strip unnecessary chars
             # remove "add" from results
-            skills_list = [li.text.strip().replace("Add", "") for li in ul.find_all("li")]
+            skills_list = [
+                li.text.strip().replace("Add", "") for li in ul.find_all("li")
+            ]
             # remove /n and spaces from results
             cleaned_list = [item.strip() for item in skills_list]
             # create a readable string
@@ -328,22 +371,19 @@ with webdriver.Chrome() as browser:
 
         # clean \n
         main_details = main_details.strip()
-
         data_tup = data_tup + (main_details,)
-
         # add link at last column
         data_tup = data_tup + (indv_url,)
+
         randomize_move(browser)
 
         # add all data into data frame
         data.append(data_tup)
-
         time.sleep(2)
-        tmp += 1
 
+        tmp += 1
         if tmp == num_of_jobs:
             break
-
 
     browser.quit()
 
