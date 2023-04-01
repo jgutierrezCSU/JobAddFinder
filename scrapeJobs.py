@@ -15,6 +15,7 @@ import pickle
 from tqdm import tqdm
 from time import sleep
 from urllib.parse import urljoin
+import user_input_validations as uiv
 import df_to_email
 import random
 
@@ -32,107 +33,29 @@ def randomize_move(b):
 #TODO add job level detail
 
 
-def validate_string(prompt):
-    while True:
-        string_input = input(prompt).replace(" ", "")
-        if not string_input.isalpha():
-            print("Invalid input. Please enter a string with no numeric values.")
-        else:
-            return string_input
-
-
-def get_num_jobs():
-    while True:
-        try:
-            num_of_jobs = input("Enter max number of jobs to get (1-100): ")
-            if num_of_jobs.startswith("0") or not num_of_jobs.isnumeric():
-                raise ValueError
-            num_of_jobs = int(num_of_jobs)
-            if num_of_jobs < 1 or num_of_jobs > 100:
-                raise ValueError
-            break
-        except ValueError:
-            print("Invalid input. Please enter a number between 1 and 100.")
-    return num_of_jobs
-
-
-def get_distance():
-    # 5=8k 10=18k 25=40k 50=80k 100=160
-    distances = {8: 5, 18: 10, 40: 25, 80: 50, 160: 100}
-
-    while True:
-        try:
-            distance_km = input("Enter distance in km (8 - 18 - 40 - 80 - 160): ")
-            if distance_km.startswith("0") or not distance_km.isnumeric():
-                raise ValueError
-            distance_km = int(distance_km)
-            if distance_km not in distances:
-                raise ValueError
-            distance = distances[distance_km]
-            break
-        except ValueError:
-            print("Invalid input. Please enter a valid distance.")
-
-    return distance
-
-
-def get_sortby_choice():
-    # Define list of valid sorting options
-    options = [
-        "job title",
-        "company name",
-        "main location",
-        "work place type",
-        "date posted",
-        "skills",
-        "distance traveltime",
-    ]
-    while True:
-        sortby_choice = input(f"Sort by? options: {', '.join(options)}\n")
-        if sortby_choice in options:
-            # clean leadin ending spaces and insert _
-            sortby_choice = sortby_choice.strip().replace(" ", "_")
-            sortby_choice = sortby_choice.upper()
-            # use INT_MIN_DURATION column for this sorting
-            if sortby_choice == "DISTANCE_TRAVELTIME":
-                sortby_choice = "INT_MIN_DURATION"
-            return sortby_choice
-        else:
-            print("Invalid choice. Please enter a valid sorting option.")
-
-
-def validate_email(prompt):
-    while True:
-        email_input = input(prompt)
-        if not re.match(r"[^@]+@[^@]+\.[^@]+", email_input):
-            print("Invalid email. Please enter a valid email address.")
-        else:
-            return email_input
-
-
 # uncomment for user input
-# job_title = validate_string("Enter job title: ")
-# job_city = validate_string("Enter city: ")
-# job_country = validate_string("Enter job Country: ")
-# job_state = validate_string("Enter job State: ")
-# receiver_email = validate_email("Enter email address: ")
-# num_of_jobs = get_num_jobs()
-# distance = get_distance()
-#sortby_choice = get_sortby_choice()
-# logging_in = input("Log in ? y/n: ")
+job_title = uiv.validate_string("Enter job title: ")
+job_city = uiv.validate_string("Enter city: ")
+job_country = uiv.validate_string("Enter job Country: ")
+job_state = uiv.validate_string("Enter job State: ")
+receiver_email = uiv.validate_email("Enter email address: ")
+num_of_jobs = uiv.get_num_jobs()
+distance = uiv.get_distance()
+sortby_choice = uiv.get_sortby_choice()
+logging_in = input("Log in ? y/n: ")
 
 
 # fixed variables, comment for user input
-job_title = "it"
-job_city = "Weinsberg"
-job_country = "Germany"
-job_state = "baden-Württemberg"
-num_of_jobs =95
-sortby_choice="INT_MIN_DURATION"
-distance=25
-email_to = "jesusg714@gmail.com"  # can send to multiple emails
-logging_in = "n"
-given_origin = "Weinsberg,baden-Württemberg"
+# job_title = "it"
+# job_city = "Weinsberg"
+# job_country = "Germany"
+# job_state = "baden-Württemberg"
+# num_of_jobs =95
+# sortby_choice="INT_MIN_DURATION"
+# distance=25
+# email_to = "jesusg714@gmail.com"  # can send to multiple emails
+# logging_in = "n"
+# given_origin = "Weinsberg,baden-Württemberg"
 
 
 
