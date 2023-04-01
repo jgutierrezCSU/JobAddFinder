@@ -1,0 +1,78 @@
+
+
+def validate_string(prompt):
+    while True:
+        string_input = input(prompt).replace(" ", "")
+        if not string_input.isalpha():
+            print("Invalid input. Please enter a string with no numeric values.")
+        else:
+            return string_input
+
+
+def get_num_jobs():
+    while True:
+        try:
+            num_of_jobs = input("Enter max number of jobs to get (1-100): ")
+            if num_of_jobs.startswith("0") or not num_of_jobs.isnumeric():
+                raise ValueError
+            num_of_jobs = int(num_of_jobs)
+            if num_of_jobs < 1 or num_of_jobs > 100:
+                raise ValueError
+            break
+        except ValueError:
+            print("Invalid input. Please enter a number between 1 and 100.")
+    return num_of_jobs
+
+
+def get_distance():
+    # 5=8k 10=18k 25=40k 50=80k 100=160
+    distances = {8: 5, 18: 10, 40: 25, 80: 50, 160: 100}
+
+    while True:
+        try:
+            distance_km = input("Enter distance in km (8 - 18 - 40 - 80 - 160): ")
+            if distance_km.startswith("0") or not distance_km.isnumeric():
+                raise ValueError
+            distance_km = int(distance_km)
+            if distance_km not in distances:
+                raise ValueError
+            distance = distances[distance_km]
+            break
+        except ValueError:
+            print("Invalid input. Please enter a valid distance.")
+
+    return distance
+
+
+def get_sortby_choice():
+    # Define list of valid sorting options
+    options = [
+        "job title",
+        "company name",
+        "main location",
+        "work place type",
+        "date posted",
+        "skills",
+        "distance traveltime",
+    ]
+    while True:
+        sortby_choice = input(f"Sort by? options: {', '.join(options)}\n")
+        if sortby_choice in options:
+            # clean leadin ending spaces and insert _
+            sortby_choice = sortby_choice.strip().replace(" ", "_")
+            sortby_choice = sortby_choice.upper()
+            # use INT_MIN_DURATION column for this sorting
+            if sortby_choice == "DISTANCE_TRAVELTIME":
+                sortby_choice = "INT_MIN_DURATION"
+            return sortby_choice
+        else:
+            print("Invalid choice. Please enter a valid sorting option.")
+
+
+def validate_email(prompt):
+    while True:
+        email_input = input(prompt)
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", email_input):
+            print("Invalid email. Please enter a valid email address.")
+        else:
+            return email_input

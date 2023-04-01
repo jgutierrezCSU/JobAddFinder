@@ -43,13 +43,7 @@ Email sending: The function then sets up the SMTP port number and server name fo
 
 # Script Requirements
 
-This script uses the following libraries:
-
-- Python 3.x
-- Selenium WebDriver
-- pandas
-- requests
-- BeautifulSoup
+- Libraries needed are in requirements.txt
 
 ## Installation
 
@@ -58,65 +52,70 @@ This script uses the following libraries:
 1. Install Python 3.x from the official website.
 2. Install Selenium WebDriver using the following command in the command prompt:
 
-    ```
-    py -m pip install selenium
-    ```
+   ```
+   py -m pip install selenium
+   ```
 
 3. Install pandas using the following command in the command prompt:
 
-    ```
-    py -m pip install pandas
-    ```
+   ```
+   py -m pip install pandas
+   ```
 
 4. Install requests using the following command in the command prompt:
 
-    ```
-    py -m pip install requests
-    ```
+   ```
+   py -m pip install requests
+   ```
 
 5. Install BeautifulSoup using the following command in the command prompt:
 
-    ```
-    py -m pip install beautifulsoup4
-    ```
+   ```
+   py -m pip install beautifulsoup4
+   ```
+
 6. Install Progressbar via cmd:
 
-    ```
-    py -m pip install progress progressbar2 alive-progress tqdm
+   ```
+   py -m pip install progress progressbar2 alive-progress tqdm
+
+   ```
 
 7. Create a localcred.py file and define your credentials as needed.
 
-### Linux
+### Linux (auto install w/ pip install -r requirements.txt)
 
 1. Install Python 3.x using your distribution's package manager.
 2. Install Selenium WebDriver using the following command in the terminal:
 
-    ```
-    pip3 install selenium
-    ```
+   ```
+   pip3 install selenium
+   ```
 
 3. Install pandas using the following command in the terminal:
 
-    ```
-    pip3 install pandas
-    ```
+   ```
+   pip3 install pandas
+   ```
 
 4. Install requests using the following command in the terminal:
 
-    ```
-    pip3 install requests
-    ```
+   ```
+   pip3 install requests
+   ```
 
 5. Install BeautifulSoup using the following command in the terminal:
 
-    ```
-    pip3 install beautifulsoup4
-    ```
+   ```
+   pip3 install beautifulsoup4
+   ```
+
 6. Install Progressbar via terminal:
 
-    ```
-    pip3 install progress progressbar2 alive-progress tqdm
-    ```
+   ```
+   pip3 install progress progressbar2 alive-progress tqdm
+   ```
+
 7. Create a localcred.py file and define your credentials as needed.
 
 ## Credentials
@@ -125,6 +124,3 @@ Create a localcred.py file in the same directory as your script and define your 
 <br>
 ** Note that this file should be kept private and not be pushed to any public repositories.
 place it the .gitignore file**
-
-
-

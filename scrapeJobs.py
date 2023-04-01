@@ -13,6 +13,7 @@ import pickle
 from tqdm import tqdm
 from time import sleep
 from urllib.parse import urljoin
+import user_input_validations as uiv
 import df_to_email
 import random
 
@@ -40,139 +41,30 @@ def randomize_move(browser):
 # TODO: Add job level detail.
 
 
-def validate_string(prompt):
-    """
-    Prompt the user to input a string without any numeric values.
-
-    Parameters:
-    prompt (str): The prompt to display to the user.
-
-    Returns:
-    str: The validated string input by the user.
-    """
-    while True:
-        string_input = input(prompt).replace(" ", "")
-        if not string_input.isalpha():
-            print("Invalid input. Please enter a string with no numeric values.")
-        else:
-            return string_input
-
-
-def get_num_jobs():
-    """
-    Prompt the user to input the maximum number of jobs to get (between 1 and 100).
-
-    Returns:
-    int: The validated number of jobs input by the user.
-    """
-    while True:
-        try:
-            num_of_jobs = input("Enter max number of jobs to get (1-100): ")
-            if num_of_jobs.startswith("0") or not num_of_jobs.isnumeric():
-                raise ValueError
-            num_of_jobs = int(num_of_jobs)
-            if num_of_jobs < 1 or num_of_jobs > 100:
-                raise ValueError
-            break
-        except ValueError:
-            print("Invalid input. Please enter a number between 1 and 100.")
-    return num_of_jobs
-
-
-def get_distance():
-    """
-    Prompt the user to input the distance in km (8, 18, 40, 80, or 160).
-
-    Returns:
-    int: The distance in miles corresponding to the validated distance in km input by the user.
-    """
-    # Define dictionary of valid distance options and their corresponding values in miles.
-    distances = {8: 5, 18: 10, 40: 25, 80: 50, 160: 100}
-
-    while True:
-        try:
-            distance_km = input("Enter distance in km (8 - 18 - 40 - 80 - 160): ")
-            if distance_km.startswith("0") or not distance_km.isnumeric():
-                raise ValueError
-            distance_km = int(distance_km)
-            if distance_km not in distances:
-                raise ValueError
-            distance = distances[distance_km]
-            break
-        except ValueError:
-            print("Invalid input. Please enter a valid distance.")
-
-    return distance
-
-
-def get_sortby_choice():
-    """
-    Prompts the user to select a sorting option from a predefined list.
-    Returns the selected sorting option after cleaning and formatting it.
-    """
-    # Define list of valid sorting options
-    options = [
-        "job title",
-        "company name",
-        "main location",
-        "work place type",
-        "date posted",
-        "skills",
-        "distance traveltime",
-    ]
-    while True:
-        sortby_choice = input(f"Sort by? options: {', '.join(options)}\n")
-        if sortby_choice in options:
-            # clean leading and ending spaces and insert an underscore instead of a space
-            sortby_choice = sortby_choice.strip().replace(" ", "_")
-            # convert the sorting option to uppercase
-            sortby_choice = sortby_choice.upper()
-            # use INT_MIN_DURATION column for this sorting option
-            if sortby_choice == "DISTANCE_TRAVELTIME":
-                sortby_choice = "INT_MIN_DURATION"
-            return sortby_choice
-        else:
-            print("Invalid choice. Please enter a valid sorting option.")
-
-
-def validate_email(prompt):
-    """
-    Prompts the user to enter an email address and validates its format.
-    Returns the email address if it is valid.
-    """
-    while True:
-        email_input = input(prompt)
-        if not re.match(r"[^@]+@[^@]+\.[^@]+", email_input):
-            print("Invalid email. Please enter a valid email address.")
-        else:
-            return email_input
-
-
 # uncomment for user input
-# job_title = validate_string("Enter job title: ")
-# job_city = validate_string("Enter city: ")
-# job_country = validate_string("Enter job Country: ")
-# job_state = validate_string("Enter job State: ")
-# receiver_email = validate_email("Enter email address: ")
-# num_of_jobs = get_num_jobs()
-# distance = get_distance()
-# sortby_choice = get_sortby_choice()
-# logging_in = input("Log in ? y/n: ")
-# if logging_in != "y":
-#     print("Not logging In")
+job_title = uiv.validate_string("Enter job title: ")
+job_city = uiv.validate_string("Enter city: ")
+job_country = uiv.validate_string("Enter job Country: ")
+job_state = uiv.validate_string("Enter job State: ")
+receiver_email = uiv.validate_email("Enter email address: ")
+num_of_jobs = uiv.get_num_jobs()
+distance = uiv.get_distance()
+sortby_choice = uiv.get_sortby_choice()
+logging_in = input("Log in ? y/n: ")
 
 
-# fixed variables, for testing
-job_title = "it"
-job_city = "Weinsberg"
-job_country = "Germany"
-job_state = "baden-Württemberg"
-num_of_jobs = 2
-sortby_choice = "INT_MIN_DURATION"
-distance = 25
-email_to = "jesusg714@gmail.com"  # can send to multiple emails
-logging_in = "y"
-given_origin = "Weinsberg,baden-Württemberg"
+# fixed variables, comment for user input
+# job_title = "it"
+# job_city = "Weinsberg"
+# job_country = "Germany"
+# job_state = "baden-Württemberg"
+# num_of_jobs =95
+# sortby_choice="INT_MIN_DURATION"
+# distance=25
+# email_to = "jesusg714@gmail.com"  # can send to multiple emails
+# logging_in = "n"
+# given_origin = "Weinsberg,baden-Württemberg"
+
 
 
 # So script wont always log user in and get detected, get cookies
@@ -191,12 +83,12 @@ if logging_in == "y":
 
     # find username field and enter credentials
     username = wait.until(EC.visibility_of_element_located((By.NAME, "session_key")))
-    username.send_keys(localcred.u_cred)
+    username.send_keys(localcred.linkedin_uname)
     time.sleep(3)
 
     # find password field and enter credentials
     pword = browser.find_element(By.ID, "password")
-    pword.send_keys(localcred.p_cred)
+    pword.send_keys(localcred.linkedin_pword)
     time.sleep(3)
 
     # click the login button
