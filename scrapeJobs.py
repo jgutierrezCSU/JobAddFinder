@@ -5,7 +5,6 @@ from selenium.webdriver.support.expected_conditions import visibility_of_element
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
 import pandas as pd
-import re
 import requests
 from bs4 import BeautifulSoup
 import time

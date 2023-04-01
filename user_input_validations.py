@@ -1,6 +1,13 @@
-
+import re
 
 def validate_string(prompt):
+    """
+    Prompt the user to input a string without any numeric values.
+    Parameters:
+    prompt (str): The prompt to display to the user.
+    Returns:
+    str: The validated string input by the user.
+    """
     while True:
         string_input = input(prompt).replace(" ", "")
         if not string_input.isalpha():
@@ -10,6 +17,11 @@ def validate_string(prompt):
 
 
 def get_num_jobs():
+    """
+    Prompt the user to input the maximum number of jobs to get (between 1 and 100).
+    Returns:
+    int: The validated number of jobs input by the user.
+    """
     while True:
         try:
             num_of_jobs = input("Enter max number of jobs to get (1-100): ")
@@ -25,6 +37,11 @@ def get_num_jobs():
 
 
 def get_distance():
+    """
+    Prompt the user to input the distance in km (8, 18, 40, 80, or 160).
+    Returns:
+    int: The distance in miles corresponding to the validated distance in km input by the user.
+    """
     # 5=8k 10=18k 25=40k 50=80k 100=160
     distances = {8: 5, 18: 10, 40: 25, 80: 50, 160: 100}
 
@@ -45,6 +62,10 @@ def get_distance():
 
 
 def get_sortby_choice():
+    """
+    Prompts the user to select a sorting option from a predefined list.
+    Returns the selected sorting option after cleaning and formatting it.
+    """
     # Define list of valid sorting options
     options = [
         "job title",
@@ -70,6 +91,10 @@ def get_sortby_choice():
 
 
 def validate_email(prompt):
+    """
+    Prompts the user to enter an email address and validates its format.
+    Returns the email address if it is valid.
+    """
     while True:
         email_input = input(prompt)
         if not re.match(r"[^@]+@[^@]+\.[^@]+", email_input):
