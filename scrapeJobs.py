@@ -4,13 +4,11 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.expected_conditions import visibility_of_element_located
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
-
 import pandas as pd
 import re
 import requests
 from bs4 import BeautifulSoup
 import time
-import localcred
 import pickle
 from tqdm import tqdm
 from time import sleep
@@ -19,18 +17,28 @@ import user_input_validations as uiv
 import df_to_email
 import random
 
+import localcred
+
+""" 
+file needs : linkedin_uname ,linkedin_pword ,
+email_pword ()
+API_KEY ()
+
+"""
 
 
-def randomize_move(b):
-    random_number = random.randint(800,1200)
+def randomize_move(browser):
+    """
+    Scroll the browser window to a random position between 800 and 1200 pixels.
+    """
+    random_number = random.randint(800, 1200)
     random_number = str(random_number)
-    b.execute_script(f"window.scrollTo(10, {random_number})")
+    browser.execute_script(f"window.scrollTo(10, {random_number})")
 
 
-# TODO move inputs to functions
-# TODO get jobid from URLs
-# TODO check for duplicate posting when traversing pages
-#TODO add job level detail
+# TODO: Get job ID from URLs.
+# TODO: Check for duplicate postings when traversing pages.
+# TODO: Add job level detail.
 
 
 # uncomment for user input
@@ -62,90 +70,103 @@ logging_in = input("Log in ? y/n: ")
 # So script wont always log user in and get detected, get cookies
 
 
-
 if logging_in == "y":
-    browser = webdriver.Chrome()  # start a web browser
+    # start a web browser
+    browser = webdriver.Chrome()
     """ Opening linkedIn's login page & Log in """
+    # opening LinkedIn's login page and logging in
     randomize_move(browser)
     browser.get("https://linkedin.com/uas/login")
+
     # waiting for the page to load
     wait = WebDriverWait(browser, 20)
+
+    # find username field and enter credentials
     username = wait.until(EC.visibility_of_element_located((By.NAME, "session_key")))
-    username = browser.find_element(By.ID, "username")
-    username.send_keys(localcred.u_cred)
+    username.send_keys(localcred.linkedin_uname)
     time.sleep(3)
-    # submit entries
+
+    # find password field and enter credentials
     pword = browser.find_element(By.ID, "password")
-    pword.send_keys(localcred.p_cred)
+    pword.send_keys(localcred.linkedin_pword)
     time.sleep(3)
-    # click the button
+
+    # click the login button
     button = browser.find_element(By.XPATH, "//button[text()='Sign in']").click()
     time.sleep(3)
-    # steps to login
+
+    # save login session cookies
     pickle.dump(browser.get_cookies(), open("cookies.pkl", "wb"))
+
+    # close the browser
     browser.close()
-    """ Logged in Now """
+
+# indicate that the user is logged in
+""" Logged in Now """
+
 
 # Calculate num of pages needed to traverse
 page = (num_of_jobs - 1) // 25 + 1
-# search all pages
-job_links = []
 
+job_links = []
 # Create a new instance of the Firefox driver
 with webdriver.Chrome() as browser:
     browser.get("https://www.linkedin.com")
-    cookies = pickle.load(open("cookies.pkl", "rb"))
-    for cookie in cookies:
-        browser.add_cookie(cookie)
-    browser.refresh()
+    try:
+        cookies = pickle.load(open("cookies.pkl", "rb"))
+        for cookie in cookies:
+            browser.add_cookie(cookie)
+        browser.refresh()
+    except FileNotFoundError:
+        print("No cookies found, run script with 'y' option in log in prompt ?")
+        quit()
     time.sleep(2)
 
-    #go to jobs page
+    # go to jobs page
     url = f"https://www.linkedin.com/jobs/search/?currentJobId=3501167810&distance={distance}&geoId=107182689&keywords={job_title}&location={job_city}%2C%20{job_state}%2C%20Germany&refresh=true"
-    print("outside")
     for page_num in range(1, page + 1):
-
-        print(page_num,page+1)
         browser.get(url)
         # Get the page source using Selenium
         page_source = browser.page_source
         # Parse the page source with BeautifulSoup
-        soup = BeautifulSoup(page_source, 'html.parser')
+        soup = BeautifulSoup(page_source, "html.parser")
         time.sleep(1)
         # Find the element with the class "jobs-search-results-list"
-        element = browser.find_element(By.CLASS_NAME, 'jobs-search-results-list')
+        element = browser.find_element(By.CLASS_NAME, "jobs-search-results-list")
 
         # Scroll the element down by the specified amount
-        for i in range(5): # Scroll down 10 times
-            browser.execute_script(f"arguments[0].scrollBy(0, {800});",element)
+        for i in range(5):  # Scroll down 10 times
+            browser.execute_script(f"arguments[0].scrollBy(0, {800});", element)
             time.sleep(2)
         time.sleep(4)
 
-        #now that its loaded, grab new loaded content source
+        # now that its loaded, grab new loaded content source
         page_source = browser.page_source
         # Parse the page source with BeautifulSoup
-        soup = BeautifulSoup(page_source, 'html.parser')
+        soup = BeautifulSoup(page_source, "html.parser")
         time.sleep(1)
 
         # find all elements with the class "full-width artdeco-entity-lockup__title ember-view"
-        elements = soup.find_all("div", class_="full-width artdeco-entity-lockup__title ember-view")
+        elements = soup.find_all(
+            "div", class_="full-width artdeco-entity-lockup__title ember-view"
+        )
         # Loop through each div element and extract the href attribute of the first <a> tag
         for div in elements:
-            href = div.find('a').get('href')
+            href = div.find("a").get("href")
             # Convert relative links to absolute links
             absolute_href = urljoin(url, href)
             # Add absolute link to job_links list
             job_links.append(absolute_href)
 
-        print(len(job_links))
-
         # find the button using its CSS selector
-        button = browser.find_element(By.CSS_SELECTOR, f'button[aria-label="Page {str(page_num+1)}"]')
+        button = browser.find_element(
+            By.CSS_SELECTOR, f'button[aria-label="Page {str(page_num+1)}"]'
+        )
         # click the button
         button.click()
         time.sleep(2)
-        url=browser.current_url
-        
+        url = browser.current_url
+
     # quit()
     # get number of items request (shorten list if necessary)
     job_links = job_links[:num_of_jobs]
@@ -227,7 +248,9 @@ with webdriver.Chrome() as browser:
         if ul is not None:
             # now that I have <li> with skills,strip unnecessary chars
             # remove "add" from results
-            skills_list = [li.text.strip().replace("Add", "") for li in ul.find_all("li")]
+            skills_list = [
+                li.text.strip().replace("Add", "") for li in ul.find_all("li")
+            ]
             # remove /n and spaces from results
             cleaned_list = [item.strip() for item in skills_list]
             # create a readable string
@@ -251,22 +274,19 @@ with webdriver.Chrome() as browser:
 
         # clean \n
         main_details = main_details.strip()
-
         data_tup = data_tup + (main_details,)
-
         # add link at last column
         data_tup = data_tup + (indv_url,)
+
         randomize_move(browser)
 
         # add all data into data frame
         data.append(data_tup)
-
         time.sleep(2)
-        tmp += 1
 
+        tmp += 1
         if tmp == num_of_jobs:
             break
-
 
     browser.quit()
 
