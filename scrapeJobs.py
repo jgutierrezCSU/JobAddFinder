@@ -15,7 +15,6 @@ from urllib.parse import urljoin
 import user_input_validations as uiv
 import df_to_email
 import random
-
 import localcred
 
 """ 
