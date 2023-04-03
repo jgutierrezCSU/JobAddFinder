@@ -96,14 +96,16 @@ def get_sortby_choice():
             break
 
 
-def validate_email(prompt):
+def validate_email():
     """
     Prompts the user to enter an email address and validates its format.
     Returns the email address if it is valid.
     """
     while True:
-        email_input = input(prompt)
+        email_input = input()
         if not re.match(r"[^@]+@[^@]+\.[^@]+", email_input):
             print("Invalid email. Please enter a valid email address.")
+            #for testing
+            break
         else:
             return email_input

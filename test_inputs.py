@@ -1,11 +1,10 @@
-from user_input_validations import validate_string, get_num_jobs, get_distance,get_sortby_choice
+from user_input_validations import validate_string, get_num_jobs, get_distance,get_sortby_choice, validate_email
 
 import pytest
 from unittest import mock
 
-import pytest
-from unittest import mock
-
+#run test $ py -m pytest -s 
+#run cove $ py -m pytest -s --cov=test_inputs --cov-report=html
 @pytest.fixture
 def mock_input():
     with mock.patch('builtins.input') as mocked:
@@ -36,6 +35,10 @@ def test_validate_string(mock_input, capsys):
     assert validate_string() == None
     #Test for third item in side_effect
     assert validate_string() == " Hambung "
+
+     # Capture the output when error produced
+    captured = capsys.readouterr()
+    assert captured.out.strip() == "Invalid input. Please enter a non-numeric string."
  
 @pytest.mark.parametrize("input_values, expected_output", [
     (["12", "8", "99"], [12, 8, 99]),  # Test case 1: Valid input
@@ -58,8 +61,6 @@ def test_get_num_jobs(input_values, expected_output, monkeypatch, capsys):
     ("1", ""),
     ("068", ""),
     ("a66", ""),
-    
-    
 ])
 def test_get_distance(input_value, expected_output, monkeypatch, capsys):
     monkeypatch.setattr('builtins.input', lambda x: input_value)
@@ -80,3 +81,18 @@ def test_get_distance(input_value, expected_output, monkeypatch, capsys):
 def test_get_sortby_choice(input_value, expected_output, monkeypatch):
     monkeypatch.setattr('builtins.input', lambda _: input_value)
     assert get_sortby_choice() == expected_output
+
+    
+
+
+
+@pytest.mark.parametrize("input_value, expected_output", [
+    ("anemail@gmail.com", "anemail@gmail.com"),
+    ("joeemail123@yahoo.com", "joeemail123@yahoo.com"),
+    ("1977jane_2@hotmail.com", "1977jane_2@hotmail.com"),
+    ("missing@domain",None),
+    ("invalid@.com",None)
+])
+def test_validate_email(input_value, expected_output, monkeypatch):
+    monkeypatch.setattr('builtins.input', lambda: input_value)
+    assert validate_email() == expected_output
