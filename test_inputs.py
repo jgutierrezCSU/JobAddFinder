@@ -1,4 +1,5 @@
 from user_input_validations import validate_string
+from user_input_validations import get_num_jobs
 
 import pytest
 from unittest import mock
@@ -36,4 +37,14 @@ def test_validate_string(mock_input, capsys):
     assert validate_string() == None
     #Test for third item in side_effect
     assert validate_string() == " Hambung "
-     
+ 
+@pytest.mark.parametrize("input_values, expected_output", [
+    (["12", "8", "99"], [12, 8, 99]),  # Test case 1: Valid input
+    (["10", "abc", "101", "50"], [10, None, None, 50]),  # Test case 2: Invalid input followed by valid input
+    (["100", "-5", "200", ""], [100, None, None, None]),  # Test case 3: Empty input followed by invalid input and valid input
+])
+def test_get_num_jobs(input_values, expected_output, monkeypatch, capsys):
+    monkeypatch.setattr("builtins.input", lambda _: input_values.pop(0))
+    assert get_num_jobs() == expected_output.pop(0)
+    captured = capsys.readouterr()
+    assert captured.out.strip() == ""  # Ensure no output is produced

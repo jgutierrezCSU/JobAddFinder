@@ -13,6 +13,7 @@ def validate_string():
         try:
             float(user_input)
             print("Invalid input. Please enter a non-numeric string.")
+            break  #for testing
         except ValueError:
             return user_input
 
