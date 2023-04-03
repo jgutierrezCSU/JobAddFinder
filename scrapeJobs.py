@@ -17,8 +17,9 @@ import df_to_email
 import random
 import localcred
 
-""" 
-file needs : linkedin_uname ,linkedin_pword ,
+"""
+localcred file needs :
+linkedin_uname ,linkedin_pword ,
 email_pword ()
 API_KEY ()
 
@@ -35,33 +36,36 @@ def randomize_move(browser):
 
 
 # TODO: Get job ID from URLs.
-# TODO: Check for duplicate postings when traversing pages.
 # TODO: Add job level detail.
 
 
-# uncomment for user input
-job_title = uiv.validate_string("Enter job title: ")
-job_city = uiv.validate_string("Enter city: ")
-job_country = uiv.validate_string("Enter job Country: ")
-job_state = uiv.validate_string("Enter job State: ")
-receiver_email = uiv.validate_email("Enter email address: ")
-num_of_jobs = uiv.get_num_jobs()
-distance = uiv.get_distance()
-sortby_choice = uiv.get_sortby_choice()
-logging_in = input("Log in ? y/n: ")
+# # uncomment for user input
+# print("Enter job title: ")
+# job_title = uiv.validate_string()
+# print("Enter city: ")
+# job_city = uiv.validate_string()
+# print("Enter job Country: ")
+# job_country = uiv.validate_string()
+# print("Enter job State: ")
+# job_state = uiv.validate_string()
+# receiver_email = uiv.validate_email("Enter email address: ")
+# num_of_jobs = uiv.get_num_jobs()
+# distance = uiv.get_distance()
+# sortby_choice = uiv.get_sortby_choice()
+# logging_in = input("Log in ? y/n: ")
 
 
 # fixed variables, comment for user input
-# job_title = "it"
-# job_city = "Weinsberg"
-# job_country = "Germany"
-# job_state = "baden-Württemberg"
-# num_of_jobs =95
-# sortby_choice="INT_MIN_DURATION"
-# distance=25
-# email_to = "jesusg714@gmail.com"  # can send to multiple emails
-# logging_in = "n"
-# given_origin = "Weinsberg,baden-Württemberg"
+job_title = "it"
+job_city = "Weinsberg"
+job_country = "Germany"
+job_state = "baden-Württemberg"
+num_of_jobs =2
+sortby_choice="INT_MIN_DURATION"
+distance=25
+email_to = "jesusg714@gmail.com"  # can send to multiple emails
+logging_in = "n"
+given_origin = "Weinsberg,baden-Württemberg"
 
 
 

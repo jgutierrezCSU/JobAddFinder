@@ -166,7 +166,7 @@ def clean_data(df, sortby_choice, given_origin):
     # Concatenate column names and text into a single column, excluding column "main_datails" , can also put a list of columns
     df["SUM_DETAILS"] = df.apply(
         lambda row: "<br><br>".join(
-            [f"{col}: {str(row[col])}" for col in df.columns if col != "MAIN_DETAILS"]
+            [f"{col}: {str(row[col])}" for col in df.columns if col != "MAIN_DETAILS" if col != "INT_MIN_DURATION"]
         ),
         axis=1,
     )
@@ -293,4 +293,4 @@ def send_emails(df, email_to):
 
 # df = pd.read_csv("my_data_raw.csv")
 # df = clean_data(df, "INT_MIN_DURATION", "Weinsberg,baden-Württemberg")
-# create_html_file2(df)
+# format_html_results.create_html_file(df)

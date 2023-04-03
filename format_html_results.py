@@ -23,7 +23,7 @@ def create_html_file(df):
       <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
       <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">  <!-- added -->
 
-      <title>Table with Checkboxes</title>
+      <title>Job Results Table</title>
       <!-- added style-->
         <style>
              body {
@@ -46,18 +46,20 @@ def create_html_file(df):
     """
     # Iterate through each row in the dataframe
     for index, row in df.iterrows():
+        # Split the text at the string "LINKS:"
+        summary, links = row['SUM_DETAILS'].split('LINK:')
         # Create a row for each record in the DataFrame
         html_table += f"""
-            <tr>
-              <th scope="row"  style="text-align:right" >
-                <input type="checkbox" class="form-check-input" id="row{index+1}">
-              </th>
-              <td style="max-width:300px;word-wrap:break-word">{row['SUM_DETAILS']}</td>
-              <td style="max-width:300px;word-wrap:break-word">{row['MAIN_DETAILS']}</td>
-              <td>
-                <button type="button" class="btn btn-primary" onclick="hideRow('row{index+1}')">Hide</button>
-              </td>
-            </tr>
+        <tr>
+          <th scope="row"  style="text-align:right" >
+            <input type="checkbox" class="form-check-input" id="row{index+1}">
+          </th>
+          <td style="max-width:300px;word-wrap:break-word">{summary}LINKS: <a href="{links}">{links}</a></td>
+          <td style="max-width:300px;word-wrap:break-word">{row['MAIN_DETAILS']}</td>
+          <td>
+            <button type="button" class="btn btn-primary" onclick="hideRow('row{index+1}')">Hide</button>
+          </td>
+        </tr>
         """
 
     # Add the closing tags to the HTML table
