@@ -1,5 +1,4 @@
-from user_input_validations import validate_string
-from user_input_validations import get_num_jobs
+from user_input_validations import validate_string, get_num_jobs, get_distance
 
 import pytest
 from unittest import mock
@@ -48,3 +47,21 @@ def test_get_num_jobs(input_values, expected_output, monkeypatch, capsys):
     assert get_num_jobs() == expected_output.pop(0)
     captured = capsys.readouterr()
     assert captured.out.strip() == ""  # Ensure no output is produced
+
+@pytest.mark.parametrize("input_value, expected_output", [
+    ("8", 5),
+    ("18", 10),
+    ("40", 25),
+    ("80", 50),
+    ("160", 100),
+    ("08", ""),
+    ("1", ""),
+    ("068", ""),
+    ("a66", ""),
+    
+    
+])
+def test_get_distance(input_value, expected_output, monkeypatch, capsys):
+    monkeypatch.setattr('builtins.input', lambda x: input_value)
+    assert get_distance() == expected_output
+    captured = capsys.readouterr()

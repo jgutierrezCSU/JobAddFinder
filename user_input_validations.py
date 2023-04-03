@@ -46,7 +46,8 @@ def get_distance():
     """
     # 5=8k 10=18k 25=40k 50=80k 100=160
     distances = {8: 5, 18: 10, 40: 25, 80: 50, 160: 100}
-
+    #for testing
+    distance= ""
     while True:
         try:
             distance_km = input("Enter distance in km (8 - 18 - 40 - 80 - 160): ")
@@ -59,6 +60,7 @@ def get_distance():
             break
         except ValueError:
             print("Invalid input. Please enter a valid distance.")
+            break #for testing
 
     return distance
 
