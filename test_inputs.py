@@ -1,4 +1,4 @@
-from user_input_validations import validate_string, get_num_jobs, get_distance
+from user_input_validations import validate_string, get_num_jobs, get_distance,get_sortby_choice
 
 import pytest
 from unittest import mock
@@ -65,3 +65,18 @@ def test_get_distance(input_value, expected_output, monkeypatch, capsys):
     monkeypatch.setattr('builtins.input', lambda x: input_value)
     assert get_distance() == expected_output
     captured = capsys.readouterr()
+
+
+@pytest.mark.parametrize("input_value, expected_output", [
+    ("job title", "JOB_TITLE"),
+    ("company name", "COMPANY_NAME"),
+    ("main location", "MAIN_LOCATION"),
+    ("work place type", "WORK_PLACE_TYPE"),
+    ("date posted", "DATE_POSTED"),
+    ("skills", "SKILLS"),
+    ("distance traveltime", "INT_MIN_DURATION"),
+    (None, None) # input not in options returns None
+])
+def test_get_sortby_choice(input_value, expected_output, monkeypatch):
+    monkeypatch.setattr('builtins.input', lambda _: input_value)
+    assert get_sortby_choice() == expected_output

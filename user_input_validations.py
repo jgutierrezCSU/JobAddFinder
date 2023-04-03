@@ -92,6 +92,8 @@ def get_sortby_choice():
             return sortby_choice
         else:
             print("Invalid choice. Please enter a valid sorting option.")
+            #for testing
+            break
 
 
 def validate_email(prompt):
