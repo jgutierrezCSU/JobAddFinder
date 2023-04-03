@@ -1,19 +1,20 @@
 import re
 
-def validate_string(prompt):
+def validate_string():
     """
-    Prompt the user to input a string without any numeric values.
+    Prompt the user to input a string that is not a numeric value (i.e., int or float).
     Parameters:
     prompt (str): The prompt to display to the user.
     Returns:
     str: The validated string input by the user.
     """
     while True:
-        string_input = input(prompt).replace(" ", "")
-        if not string_input.isalpha():
-            print("Invalid input. Please enter a string with no numeric values.")
-        else:
-            return string_input
+        user_input = input()
+        try:
+            float(user_input)
+            print("Invalid input. Please enter a non-numeric string.")
+        except ValueError:
+            return user_input
 
 
 def get_num_jobs():
