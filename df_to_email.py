@@ -141,15 +141,15 @@ def clean_data(df, sortby_choice, given_origin):
     # Create new Columns
     for index, row in df.iterrows():
         job_main_location = row["MAIN_LOCATION"]
-        distance, duration = get_distance(job_main_location, given_origin)
-
+        # distance, duration = get_distance(job_main_location, given_origin)
+        distance, duration = 1 ,1
         # Insert the distance and travel time into the new column
         df.at[
             index, "DISTANCE_TRAVELTIME"
         ] = f" {given_origin.split(',')[0]}  ===> {job_main_location.split(',')[0]} is {distance}, Commute is {duration}"
 
         # Get distance and duration in mins for sorting
-        dist_km, dist_mins = convert_to_numbs(distance, duration)
+        dist_km, dist_mins = 1,1
         # Insert duration in mins to last column
         df.at[index, "INT_MIN_DURATION"] = dist_mins
 

@@ -78,9 +78,9 @@ job_title = "it"
 job_city = "Weinsberg"
 job_country = "Germany"
 job_state = "baden-Württemberg"
-num_of_jobs =2
+num_of_jobs =6
 sortby_choice="INT_MIN_DURATION"
-distance=25
+distance=10
 email_to = "jesusg714@gmail.com"  # can send to multiple emails
 logging_in = "n"
 given_origin = "Weinsberg,baden-Württemberg"
@@ -143,7 +143,8 @@ with webdriver.Chrome() as browser:
     time.sleep(2)
 
     # go to jobs page
-    url = f"https://www.linkedin.com/jobs/search/?currentJobId=3501167810&distance={distance}&geoId=107182689&keywords={job_title}&location={job_city}%2C%20{job_state}%2C%20Germany&refresh=true"
+    #TODO need to get JobID automatically (keeps changing , leads to  no such element: Unable to locate element: {"method":"css selector","selector":".jobs-search-results-list"})
+    url = f"https://www.linkedin.com/jobs/search/?currentJobId=3421651472&distance={distance}&geoId=107182689&keywords={job_title}&location={job_city}%2C%20{job_state}%2C%20Germany&refresh=true"
     for page_num in range(1, page + 1):
         browser.get(url)
         # Get the page source using Selenium
@@ -155,10 +156,10 @@ with webdriver.Chrome() as browser:
         element = browser.find_element(By.CLASS_NAME, "jobs-search-results-list")
 
         # Scroll the element down by the specified amount (to load all jobs)
-        for i in range(5):  # Scroll down 10 times
+        for i in range(5):  # Scroll down 4 times
             browser.execute_script(f"arguments[0].scrollBy(0, {800});", element)
             time.sleep(2)
-        time.sleep(4)
+        time.sleep(3)
 
         # now that its loaded, grab new loaded content source
         page_source = browser.page_source
@@ -188,7 +189,7 @@ with webdriver.Chrome() as browser:
         url = browser.current_url
 
     # get number of items request (shorten list if necessary)
-    job_links = job_links[:num_of_jobs]
+    #job_links = job_links[:num_of_jobs]
     # print(job_links)
     time.sleep(2)
     randomize_move(browser)
@@ -204,9 +205,10 @@ with webdriver.Chrome() as browser:
     for cur_job in tqdm(job_links):
         #
         cur_job_id=re.search(r"/(\d+)/", cur_job).group(1)
-        print("cur:",cur_job_id,"prev" ,prev_ids)
+        # print("cur:",cur_job_id,"prev" ,prev_ids)
         if cur_job_id not in prev_ids:           
             randomize_move(browser)
+            # print("adding to list")
             # tuple contains individual info for each job post
             data_tup = ()
             # get URL
@@ -240,19 +242,38 @@ with webdriver.Chrome() as browser:
                 class_="t-24 t-bold jobs-unified-top-card__job-title",
             ).text.strip()
             data_tup = data_tup + (title,)
-
+            '''             '''
+            primary_description = soup.find('div', class_='jobs-unified-top-card__primary-description')
+            texts = primary_description.find_all(text=True)
+            #separate string by , per each index
+            text_content = [text.strip() for text in texts if text.strip()]
+            text_content = [substring for string in text_content for substring in string.split(', ')]
+            print(text_content)
+            #get info from indexes
+            company =text_content[0]
+            location=text_content[1]
+            date_posted= text_content[3]
+            workplace_type=text_content[5]
+            #append to data tuple
+            data_tup = data_tup + (company,)
+            data_tup = data_tup + (location,)
+            data_tup = data_tup + (date_posted,)
+            data_tup = data_tup + (workplace_type,)
+            """            
+            #Linked in Changes this tags
             company = soup.find(
-                "span",
-                class_="jobs-unified-top-card__company-name",
+                "a",
+                class_="app-aware-link",
             ).text.strip()
             data_tup = data_tup + (company,)
-
+            
+            
             location = soup.find(
                 "span",
-                class_="jobs-unified-top-card__bullet",
+                class_="white-space-pre",
             ).text.strip()
             data_tup = data_tup + (location,)
-
+             
             workplace_type = soup.find(
                 "span",
                 class_="jobs-unified-top-card__workplace-type",
@@ -262,12 +283,19 @@ with webdriver.Chrome() as browser:
                 data_tup = data_tup + (workplace_type,)
             else:
                 data_tup = data_tup + ("No work place info",)
-
-            date_posted = soup.find(
+       
+            #get outer tag first
+            outer_span = soup.find(
                 "span",
-                class_="jobs-unified-top-card__posted-date",
-            ).text.strip()
+                class_="tvm__text tvm__text--neutral",
+            )
+            print(outer_span)
+            #now get inner tag
+            inner_span = outer_span.find('span')
+            print(inner_span)
+            date_posted=inner_span.text.strip()
             data_tup = data_tup + (date_posted,)
+            """
 
             # Skills: get <ul> that has <li> containing all skills
             ul = soup.find("ul", {"class": "job-details-skill-match-status-list"})
@@ -315,7 +343,8 @@ with webdriver.Chrome() as browser:
             tmp += 1
             if tmp == num_of_jobs:
                 break
-        print("skipped")
+        else:
+            print("skipped")
     save_ids_localy(to_prev_ids_lst)
     browser.quit()
 
@@ -325,5 +354,5 @@ with webdriver.Chrome() as browser:
 df = pd.DataFrame(data)
 # save raw df locally before creating columns
 df.to_csv("my_data_raw.csv", index=False)
-# df = df_to_email.clean_data(df, sortby_choice, given_origin)
-# df_to_email.send_emails(df, email_to)
+df = df_to_email.clean_data(df, sortby_choice, given_origin)
+df_to_email.send_emails(df, email_to)
