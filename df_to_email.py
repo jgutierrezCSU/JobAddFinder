@@ -141,8 +141,8 @@ def clean_data(df, sortby_choice, given_origin):
     # Create new Columns
     for index, row in df.iterrows():
         job_main_location = row["MAIN_LOCATION"]
-        # distance, duration = get_distance(job_main_location, given_origin)
-        distance, duration = 1 ,1
+        distance, duration = get_distance(job_main_location, given_origin)
+        # distance, duration = 1 ,1
         # Insert the distance and travel time into the new column
         df.at[
             index, "DISTANCE_TRAVELTIME"

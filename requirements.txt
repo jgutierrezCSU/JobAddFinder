@@ -1,5 +1,3 @@
-re
-localcred
 smtplib
 email
 email.mime.multipart
@@ -15,5 +13,4 @@ bs4
 pickle
 tqdm
 urllib.parse
-df_to_email
 random

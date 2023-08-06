@@ -21,9 +21,10 @@ import json
 
 """
 localcred file needs :
-linkedin_uname ,linkedin_pword ,
-email_pword ()
-API_KEY ()
+linkedin_uname = ""
+linkedin_pword = ""
+email_pword = ""
+API_KEY=""
 
 """
 #returns list
@@ -78,7 +79,7 @@ job_title = "it"
 job_city = "Weinsberg"
 job_country = "Germany"
 job_state = "baden-Württemberg"
-num_of_jobs =6
+num_of_jobs =2
 sortby_choice="INT_MIN_DURATION"
 distance=10
 email_to = "jesusg714@gmail.com"  # can send to multiple emails
