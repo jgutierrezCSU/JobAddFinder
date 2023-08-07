@@ -79,7 +79,7 @@ job_title = "it"
 job_city = "Weinsberg"
 job_country = "Germany"
 job_state = "baden-Württemberg"
-num_of_jobs =2
+num_of_jobs =98
 sortby_choice="INT_MIN_DURATION"
 distance=10
 email_to = "jesusg714@gmail.com"  # can send to multiple emails
@@ -260,44 +260,7 @@ with webdriver.Chrome() as browser:
             data_tup = data_tup + (location,)
             data_tup = data_tup + (date_posted,)
             data_tup = data_tup + (workplace_type,)
-            """            
-            #Linked in Changes this tags
-            company = soup.find(
-                "a",
-                class_="app-aware-link",
-            ).text.strip()
-            data_tup = data_tup + (company,)
             
-            
-            location = soup.find(
-                "span",
-                class_="white-space-pre",
-            ).text.strip()
-            data_tup = data_tup + (location,)
-             
-            workplace_type = soup.find(
-                "span",
-                class_="jobs-unified-top-card__workplace-type",
-            )
-            if workplace_type is not None:
-                workplace_type = workplace_type.text.strip()
-                data_tup = data_tup + (workplace_type,)
-            else:
-                data_tup = data_tup + ("No work place info",)
-       
-            #get outer tag first
-            outer_span = soup.find(
-                "span",
-                class_="tvm__text tvm__text--neutral",
-            )
-            print(outer_span)
-            #now get inner tag
-            inner_span = outer_span.find('span')
-            print(inner_span)
-            date_posted=inner_span.text.strip()
-            data_tup = data_tup + (date_posted,)
-            """
-
             # Skills: get <ul> that has <li> containing all skills
             ul = soup.find("ul", {"class": "job-details-skill-match-status-list"})
             if ul is not None:
@@ -314,8 +277,8 @@ with webdriver.Chrome() as browser:
             else:
                 data_tup = data_tup + ("No skills section found.",)
 
-            # retrieve skills macthed
-            matched_skills = soup.find("h4", {"class": "t-bold t-16"})
+            # retrieve skills macthed\
+            matched_skills = soup.find("h2", {"class": "t-bold t-16"})
             if matched_skills is not None:
                 matched_skills = matched_skills.text.strip()
                 data_tup = data_tup + (matched_skills,)
