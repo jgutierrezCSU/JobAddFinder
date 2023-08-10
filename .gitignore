@@ -8,3 +8,4 @@ __pycache__/
 *.json
 *.html
 test_inputs.py
+chromedriver-win64/

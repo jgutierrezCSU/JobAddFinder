@@ -4,6 +4,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.expected_conditions import visibility_of_element_located
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.chrome.options import Options
+
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
@@ -79,7 +81,7 @@ job_title = "it"
 job_city = "Weinsberg"
 job_country = "Germany"
 job_state = "baden-Württemberg"
-num_of_jobs =98
+num_of_jobs =3
 sortby_choice="INT_MIN_DURATION"
 distance=10
 email_to = "jesusg714@gmail.com"  # can send to multiple emails
@@ -87,13 +89,19 @@ logging_in = "n"
 given_origin = "Weinsberg,baden-Württemberg"
 
 
+# Configure Chrome options for headless browsing
+chrome_options = Options()
+chrome_options.add_argument("--headless")  # Ensure GUI is off
+chrome_options.add_argument("--no-sandbox")
+chrome_options.add_argument("--disable-dev-shm-usage")
+
+# Set path to chromedriver executable as per your configuration
+chromedriver_path = "./chromedriver"
 
 # So script wont always log user in and get detected, get cookies
-
-
 if logging_in == "y":
     # start a web browser
-    browser = webdriver.Chrome()
+    browser = webdriver.Chrome(executable_path=chromedriver_path, options=chrome_options)
     """ Opening linkedIn's login page & Log in """
     # opening LinkedIn's login page and logging in
     randomize_move(browser)
@@ -131,7 +139,7 @@ page = (num_of_jobs - 1) // 25 + 1
 
 job_links = []
 # Create a new instance of the Chrome driver
-with webdriver.Chrome() as browser:
+with webdriver.Chrome(executable_path=chromedriver_path, options=chrome_options) as browser:
     browser.get("https://www.linkedin.com")
     try:
         cookies = pickle.load(open("cookies.pkl", "rb"))
