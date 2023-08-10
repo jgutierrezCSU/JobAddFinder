@@ -1,6 +1,6 @@
 [![Build Status](https://app.travis-ci.com/jgutierrezCSU/WebScrapperPython.svg?branch=master)](https://app.travis-ci.com/jgutierrezCSU/WebScrapperPython)
 
-Web scraper for LinkedIn using Python.
+*Headless* Web scraper for LinkedIn using Python.
 
 Features: <br>
 Scrape Jobs using "Job title" , "City" , "State", "Country" and "distance" and optionally, you can use "sort by" and calculate commute time.<br>
@@ -44,6 +44,7 @@ Email sending: The function then sets up the SMTP port number and server name fo
 # Script Requirements
 
 - Libraries needed are in requirements.txt
+- Download your chromedriver version and place in project this path. 
 
 ## Installation
 
