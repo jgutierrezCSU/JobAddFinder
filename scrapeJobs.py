@@ -60,33 +60,33 @@ def randomize_move(browser):
 # TODO: Add job level detail.
 
 
-# # uncomment for user input
-# print("Enter job title: ")
-# job_title = uiv.validate_string()
-# print("Enter city: ")
-# job_city = uiv.validate_string()
-# print("Enter job Country: ")
-# job_country = uiv.validate_string()
-# print("Enter job State: ")
-# job_state = uiv.validate_string()
-# receiver_email = uiv.validate_email("Enter email address: ")
-# num_of_jobs = uiv.get_num_jobs()
-# distance = uiv.get_distance()
-# sortby_choice = uiv.get_sortby_choice()
-# logging_in = input("Log in ? y/n: ")
+# uncomment for user input
+logging_in = input("Log in ? y/n: ")
+print("Enter job title: ")
+job_title = uiv.validate_string()
+print("Enter city: ")
+job_city = uiv.validate_string()
+print("Enter job Country: ")
+job_country = uiv.validate_string()
+print("Enter job State: ")
+job_state = uiv.validate_string()
+receiver_email = uiv.validate_email("Enter email address: ")
+num_of_jobs = uiv.get_num_jobs()
+distance = uiv.get_distance()
+sortby_choice = uiv.get_sortby_choice()
 
 
 # fixed variables, comment for user input
-job_title = "it"
-job_city = "Weinsberg"
-job_country = "Germany"
-job_state = "baden-Württemberg"
-num_of_jobs =3
-sortby_choice="INT_MIN_DURATION"
-distance=10
-email_to = "jesusg714@gmail.com"  # can send to multiple emails
-logging_in = "n"
-given_origin = "Weinsberg,baden-Württemberg"
+# job_title = "it"
+# job_city = "Weinsberg"
+# job_country = "Germany"
+# job_state = "baden-Württemberg"
+# num_of_jobs =98
+# sortby_choice="INT_MIN_DURATION"
+# distance=10
+# email_to = "jesusg714@gmail.com"  # can send to multiple emails
+# logging_in = "n"
+# given_origin = "Weinsberg,baden-Württemberg"
 
 
 # Configure Chrome options for headless browsing
