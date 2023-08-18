@@ -17,7 +17,7 @@ Main Location <br>
 Comute time (user gives origin) <br>
 Place of work (could be multiple or remote) <br>
 Date posted <br>
-Skills needed (if available) <br>
+Skills needed (if available ) <br>
 Number of matched skilled (if available) <br>
 Ranking (calculated ratio of "number of matched skills") <br>
 Main job detail. <br>
@@ -26,7 +26,7 @@ link <br>
 Code details: <br>
 Scripts prompts user if they want to manually login. If yes: <br>
 then script will use login details from a localcred.py file to login <br>
-After running script the first time user should choose no for the log in options, <br>
+**After running script the first time user should choose no for the log in options (preventing repetitive logins and avoiding detection)**, <br>
 doing this will load cookies from previous ranned script and load them to browser. <br>
 <br>
 Distance" input: allows the user to input a distance in kilometers,if none,the code sets the distance to a default value of 8 km radius<br>

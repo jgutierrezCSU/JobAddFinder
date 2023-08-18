@@ -149,7 +149,7 @@ def clean_data(df, sortby_choice, given_origin):
         ] = f" {given_origin.split(',')[0]}  ===> {job_main_location.split(',')[0]} is {distance}, Commute is {duration}"
 
         # Get distance and duration in mins for sorting
-        dist_km, dist_mins = 1,1
+        dist_km, dist_mins = convert_to_numbs(distance, duration)
         # Insert duration in mins to last column
         df.at[index, "INT_MIN_DURATION"] = dist_mins
 

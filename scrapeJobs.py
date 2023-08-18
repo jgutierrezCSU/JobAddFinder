@@ -66,14 +66,16 @@ print("Enter job title: ")
 job_title = uiv.validate_string()
 print("Enter city: ")
 job_city = uiv.validate_string()
-print("Enter job Country: ")
-job_country = uiv.validate_string()
 print("Enter job State: ")
 job_state = uiv.validate_string()
+print("Enter job Country: ")
+job_country = uiv.validate_string()
 email_to = uiv.validate_email("Enter email where to send results: ")
 num_of_jobs = uiv.get_num_jobs()
 distance = uiv.get_distance()
 sortby_choice = uiv.get_sortby_choice()
+
+
 
 
 # fixed variables, comment for user input

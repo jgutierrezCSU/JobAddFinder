@@ -75,7 +75,7 @@ def get_sortby_choice():
         "work place type",
         "date posted",
         "skills",
-        "distance traveltime",
+        "distance",
     ]
     while True:
         sortby_choice = input(f"Sort by? options: {', '.join(options)}\n")
@@ -84,7 +84,7 @@ def get_sortby_choice():
             sortby_choice = sortby_choice.strip().replace(" ", "_")
             sortby_choice = sortby_choice.upper()
             # use INT_MIN_DURATION column for this sorting
-            if sortby_choice == "DISTANCE_TRAVELTIME":
+            if sortby_choice == "DISTANCE":
                 sortby_choice = "INT_MIN_DURATION"
             return sortby_choice
         else:
